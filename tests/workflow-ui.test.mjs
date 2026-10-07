@@ -7,7 +7,7 @@ import {resolve} from 'node:path';
 import React from 'react';
 import {renderToStaticMarkup} from 'react-dom/server';
 
-const built=await build({stdin:{contents:`export {default as ExpenseForm} from './src/ExpenseForm.tsx'; export {default as LabelForm} from './src/LabelForm.tsx'; export {default as LedgerPage} from './src/LedgerPage.tsx'; export {default as Purchases} from './src/Purchases.tsx'; export {default as Customers} from './src/Customers.tsx'; export {default as RecordCleanup} from './src/RecordCleanup.tsx'; export {default as Inventory} from './src/Inventory.tsx'; export {default as SaleForm} from './src/SaleForm.tsx'; export {default as PurchaseForm} from './src/PurchaseForm.tsx'; export {default as CustomerCRM} from './src/CustomerCRM.tsx';`,resolveDir:process.cwd(),loader:'ts'},bundle:true,platform:'node',format:'esm',packages:'external',jsx:'automatic',write:false});
+const built=await build({stdin:{contents:`export {default as AccessoryForm} from './src/AccessoryForm.tsx'; export {default as ExpenseForm} from './src/ExpenseForm.tsx'; export {default as LabelForm} from './src/LabelForm.tsx'; export {default as LedgerPage} from './src/LedgerPage.tsx'; export {default as Purchases} from './src/Purchases.tsx'; export {default as Customers} from './src/Customers.tsx'; export {default as RecordCleanup} from './src/RecordCleanup.tsx'; export {default as Inventory} from './src/Inventory.tsx'; export {default as SaleForm} from './src/SaleForm.tsx'; export {default as PurchaseForm} from './src/PurchaseForm.tsx'; export {default as CustomerCRM} from './src/CustomerCRM.tsx';`,resolveDir:process.cwd(),loader:'ts'},loader:{'.png':'dataurl','.ttf':'dataurl'},bundle:true,platform:'node',format:'esm',packages:'external',jsx:'automatic',write:false});
 const temp=resolve('node_modules/.cache/workflow-ui-'+process.pid+'.mjs');
 await mkdir(resolve('node_modules/.cache'),{recursive:true});
 await writeFile(temp,built.outputFiles[0].text);
@@ -79,6 +79,16 @@ test('Expense description is required only for Other categories',()=>{
   const html=renderToStaticMarkup(React.createElement(components.ExpenseForm,{phone,initialCategory:category}));const input=html.match(/<input[^>]*name="description"[^>]*>/)?.[0]||'';if(required)assert.match(input,/required/);else assert.doesNotMatch(input,/required/);
  }
 });
-test('Accessory label form defaults to the stock quantity for identical copies',()=>{
- const html=renderToStaticMarkup(React.createElement(components.LabelForm,{item:{name:'Cable',quantity:100},accessory:true,safe:async f=>f()}));assert.match(html,/value="100"/);assert.match(html,/same accessory SKU/);assert.doesNotMatch(html,/Include battery health/);
+test('Accessory label form prints one shared label regardless of stock quantity',()=>{
+ const html=renderToStaticMarkup(React.createElement(components.LabelForm,{item:{name:'Cable',quantity:100},accessory:true,safe:async f=>f()}));assert.doesNotMatch(html,/type="number"/);assert.match(html,/one shared accessory SKU/);assert.doesNotMatch(html,/Include battery health/);
+});
+
+test('Accessory quantity additions request neither cost nor supplier; new purchases require supplier name',()=>{
+ const base={item:{name:'Cable',quantity:100},suppliers:[],onType(){}};
+ const restock=renderToStaticMarkup(React.createElement(components.AccessoryForm,{...base,action:'accessory_restock'}));assert.doesNotMatch(restock,/name="purchase_price"|name="supplier_id"|name="supplier_name"/);assert.match(restock,/existing supplier/);assert.match(restock,/name="quantity"/);
+ const purchase=renderToStaticMarkup(React.createElement(components.AccessoryForm,{...base,action:'accessory_purchase'}));assert.match(purchase.match(/<input[^>]*name="supplier_name"[^>]*>/)?.[0]||'',/required/);
+});
+test('Receivables offer balance reminders only for outstanding balances',()=>{
+ const input={...data,ledgerEntries:[{id:'r',kind:'receivable',category:'existing_balance',full_name:'Debtor',mobile:'03000000001',description:'',record_date:'2026-10-01',amount:100}],ledgerPayments:[]};const props={kind:'receivable',data:input,manager:true,save:async()=>{},setModal(){}};assert.match(renderToStaticMarkup(React.createElement(components.LedgerPage,props)),/Remind on WhatsApp/);
+ assert.doesNotMatch(renderToStaticMarkup(React.createElement(components.LedgerPage,{...props,data:{...input,ledgerPayments:[{entry_id:'r',amount:100}]}})),/Remind on WhatsApp/);
 });

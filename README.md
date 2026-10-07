@@ -168,12 +168,27 @@ Verification: `npm test`, `npm run build`, and rollback-only SQL scenarios in `d
 
 Apply `supabase/migrations/20261007221937_invoice_labels_validation.sql` after the ledger migration. Receivable/payable descriptions are optional. Expense descriptions are required only for **Other** (including **Other phone expense**); other categories accept blank descriptions. **Paid now** is required for phone/accessory purchases and quantity additions: enter `0` when nothing has been paid.
 
-**Inventory → Accessories → Add quantity** uses the saved unit purchase cost, without asking for a new cost, and posts the corresponding stock/purchase payable. It preserves the SKU and historical invoice costs. The supplier defaults to the accessory's existing supplier.
+**Inventory → Accessories → Add quantity** uses the saved unit purchase cost, without asking for a new cost, and posts the corresponding stock/purchase payable. It preserves the SKU and historical invoice costs. The original supplier is reused automatically; supplier and cost fields are not shown.
 
-Choose **Label / Labels** in Inventory, or find a phone/accessory in **Labels & scanner**, then select the number of identical labels. Labels are 50 × 30 mm with a smaller QR and Code128 barcode. Phone labels show model/storage, PTA status, IMEI (and IMEI 2 when present), with optional recorded battery health. Every accessory copy uses the same SKU; printing 100 copies produces the same label for 100 cables. Print at actual size with browser headers/footers off and matching paper dimensions; physical printer/scanner verification remains device-specific.
+Choose **Label / Labels** in Inventory, or find a phone/accessory in **Labels & scanner**. Accessory labels print one label for the product regardless of stock quantity; phone labels offer a copy count. Labels are 50 × 30 mm with a smaller QR and Code128 barcode. Phone labels show model/storage, PTA status, IMEI (and IMEI 2 when present), with optional recorded battery health. All units of an accessory share its SKU: a single cable label identifies Cable when scanned, without encoding the quantity. Print at actual size with browser headers/footers off and matching paper dimensions; physical printer/scanner verification remains device-specific.
 
 **Bill made by** accepts a typed name, defaulting to the signed-in staff name. The authenticated staff account remains the audit actor. Checkout summaries, printed/PDF invoices and WhatsApp invoice messages include model, PTA status, IMEI, storage and recorded battery health. Phone details are saved on the sale item so later inventory edits do not alter invoice history.
 
 In **Sales & invoices**, the **WhatsApp** button opens the saved customer's chat with the invoice text, phone details, billing name, total, received amount and balance ready to send. Press Send in WhatsApp. **Share invoice PDF** uses the device share sheet when supported; on desktop, it downloads the PDF and opens WhatsApp for manual attachment. The app does not automatically deliver messages or attach PDFs through WhatsApp Web.
 
 Verification adds invoice/message/label generation tests and `database/verify-invoice-labels.sql`, using rollback-only fixtures.
+
+
+## Print forms, supplier continuity and balance reminders
+
+Apply `supabase/migrations/20261007230424_document_details_existing_supplier.sql` after the invoice-label validation migration. New accessory purchases require an existing accessory supplier or a new supplier name. **Add quantity** reuses the original supplier and saved cost, preserves the SKU, and records a separate purchase with the quantity added. Original purchase product details remain saved even after later restocking.
+
+Sales invoices and purchase slips use a borderless white A4 layout with a faint AppleSpace logo watermark, business contact information, terms and signature areas. The invoice table is labeled **Product** and shows only recorded product details. Both documents show payment methods and amounts; the purchase slip adds the purchase price and includes the saved seller photo when available. Use **Download purchase slip PDF** in Purchases. The purchase slip contains the main seller section only, without a separate seller receipt. Saved seller photos print beside the seller details. Uploaded manual-form images are not bundled or published.
+
+In **Receivables ledger**, outstanding records with a phone number offer **Remind on WhatsApp**. The draft includes the person, reference and current outstanding amount. Review it and press Send in WhatsApp. Settled entries and payables do not show the reminder action.
+
+Validation: `npm test`, `npm run build`, and rollback-only scenarios in `database/verify-document-details.sql`, plus the existing invoice-label, ledger, supplier, workflow and cleanup scenarios.
+
+The forms embed the licensed DejaVu Sans font in PDFs and browser print output for consistent typography. Font files and their redistribution license are in `src/fonts`.
+
+Both forms include the saved ASPACE logo and Apple Space name at the top, with Sharoz Abbasi and Saad Ali Awan and their business numbers at the top right. The invoice has no seller-signature field; purchase signature fields remain. The same original transparent logo is used at reduced opacity behind the details.

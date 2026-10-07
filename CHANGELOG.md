@@ -1,7 +1,23 @@
+## Logo branding and contact details on printed forms
+
+- Added the saved transparent ASPACE logo to the header and as a faint background watermark on invoices and purchase slips.
+- Added Sharoz Abbasi and Saad Ali Awan with their business contact numbers at the top right.
+- Removed the invoice seller-signature field while retaining purchase signatures and the seller photo.
+
+## Borderless invoice and purchase forms, accessory continuity and reminders
+
+- Added white, borderless printed/PDF forms with a faint APPLE SPACE watermark, Product headings, optional recorded details, purchase prices and a larger saved seller photo. Purchase slips contain one seller section without a tear-off seller receipt.
+- Displayed cash, bank transfer and other payment methods on both forms and invoice WhatsApp drafts.
+- Removed supplier entry from accessory quantity additions and enforced original supplier/cost reuse in the database. New accessory purchases still require a supplier.
+- Printed one shared accessory barcode label regardless of quantity; scanning continues to select the product.
+- Saved purchase product snapshots and extended sale snapshots with recorded color, condition and warranty details.
+- Added outstanding-balance WhatsApp drafts to receivables.
+- Added PDF/form/UI tests and rollback database scenarios, including supplier continuity, idempotency and complimentary-accessory costs.
+
 ## Simpler entries, compact labels and invoice sharing
 
 - Made receivable/payable descriptions optional and expense descriptions required only for Other categories.
-- Accessory quantity additions reuse the saved purchase cost; added identical accessory labels with selectable copy counts.
+- Accessory quantity additions reuse the saved purchase cost; added identical accessory labels.
 - Added compact 50 × 30 mm phone/accessory labels with smaller QR/barcode, IMEI/PTA details and optional health.
 - Saved phone details on invoice items and displayed them in checkout, print/PDF and WhatsApp messages.
 - Replaced the billing staff selector with a typed billing name while preserving the authenticated audit actor.
