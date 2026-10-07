@@ -135,3 +135,15 @@ Cleanup removes eligible invoices and their line items/payments/cost snapshots, 
 Ledger entries are preserved to maintain cash, receivable, payable and account totals. History-based reports and CRM purchase history will omit the deleted details. Export historical reports before cleanup if you need to retain those breakdowns.
 
 For an existing installation with the V6 upgrade, apply `supabase/migrations/20261007210231_record_cleanup.sql`. This incremental migration depends on the earlier SQL in `database/`; it is not a fresh-database bootstrap. Verify using `database/verify-cleanup.sql` in a SQL editor: all fixtures, deletions and backups in that verification transaction are rolled back. Frontend checks: `npm test` and `npm run build`.
+
+## Purchases, customer dues and offer recipients
+
+Purchases show the seller name, both available IMEIs, model/storage, total and remaining payable. Search by seller, IMEI, model or purchase number; the Excel export includes these fields. Fully paid purchases show **Paid**, and phones with an unresolved purchase cost show **Cost pending**.
+
+For registered iPhone suppliers, **Seller name** is the only required seller-detail field. Mobile, CNIC and photo are optional; entered mobile/CNIC values must still have valid lengths. Selecting an existing supplier preserves their saved details when optional fields are blank. Model and IMEI remain required phone fields. Walk-in sellers still require their identity details and photo. Apply `supabase/migrations/20261007211606_supplier_optional_details.sql` after the V5 workflow upgrade for the backend validation change.
+
+**Customers** and **Shopkeepers** show only contacts with an outstanding balance across all their invoices and old opening balances. After final payment they disappear from this dues view; saved contacts remain in Customer messages and the sale customer selector. Their original invoices stay in Sales & invoices. Settled opening balances appear there as labeled receipts, keeping their original opening-balance classification and avoiding new sales revenue.
+
+In **Customer messages**, select individual customer checkboxes or **Select all matching**, edit the offer, and click **Prepare selected messages**. Review the selected recipient list, then use **Review next in WhatsApp** to open each personalized draft. Press Send in WhatsApp. Selections remain selected when you change filters; **Clear selection** resets them. The app does not automatically send messages or confirm delivery.
+
+Verification: `npm test`, `npm run build`, and the rollback-only SQL scenarios in `database/verify-supplier-details.sql`.

@@ -12,3 +12,7 @@ export function customerHistory(data,customer) {
     balance:records.reduce((n,s)=>n+due(s,data.payments||[],'sale_id','final_total'),0),
     paymentHistory:(data.payments||[]).filter(p=>records.some(s=>s.id===p.sale_id)).sort((a,b)=>new Date(b.payment_date)-new Date(a.payment_date))};
 }
+
+export function invoiceHistory(data){
+ return (data.sales||[]).filter(s=>!s.is_opening_balance||due(s,data.payments||[],'sale_id','final_total')===0);
+}
