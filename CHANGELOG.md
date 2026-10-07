@@ -1,3 +1,14 @@
+## Purchase requirements, ledgers and owner locks
+
+- New iPhone purchases require storage, PTA status and purchase cost in the form and database; registered supplier identity details remain optional except name.
+- Inventory shows phone and accessory purchase costs to owners/managers alongside sale prices.
+- Added Receivables ledger and Payables ledger with non-phone balances, categories, partial/full settlements, search, history and exports.
+- Added balanced accounting for opening balances, money lent/borrowed, service income owed and unpaid expenses; prevent overpayment and deduplicate retries.
+- Locked Daily closing and Reports to owners, including database opening/closing checks and session-read policies.
+- Added backend invoice-profit totals from immutable cost snapshots, including zero-price stocked accessories, and owner profit reporting.
+- Included manual ledgers in daily and pre-cleanup snapshots while preserving them during record cleanup.
+- Added UI, accounting, authorization and required-field regression checks.
+
 
 ## Date-range record cleanup
 

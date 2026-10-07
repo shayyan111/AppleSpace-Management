@@ -7,7 +7,7 @@ import {resolve} from 'node:path';
 import React from 'react';
 import {renderToStaticMarkup} from 'react-dom/server';
 
-const built=await build({stdin:{contents:`export {default as Purchases} from './src/Purchases.tsx'; export {default as Customers} from './src/Customers.tsx'; export {default as RecordCleanup} from './src/RecordCleanup.tsx'; export {default as Inventory} from './src/Inventory.tsx'; export {default as SaleForm} from './src/SaleForm.tsx'; export {default as PurchaseForm} from './src/PurchaseForm.tsx'; export {default as CustomerCRM} from './src/CustomerCRM.tsx';`,resolveDir:process.cwd(),loader:'ts'},bundle:true,platform:'node',format:'esm',packages:'external',jsx:'automatic',write:false});
+const built=await build({stdin:{contents:`export {default as LedgerPage} from './src/LedgerPage.tsx'; export {default as Purchases} from './src/Purchases.tsx'; export {default as Customers} from './src/Customers.tsx'; export {default as RecordCleanup} from './src/RecordCleanup.tsx'; export {default as Inventory} from './src/Inventory.tsx'; export {default as SaleForm} from './src/SaleForm.tsx'; export {default as PurchaseForm} from './src/PurchaseForm.tsx'; export {default as CustomerCRM} from './src/CustomerCRM.tsx';`,resolveDir:process.cwd(),loader:'ts'},bundle:true,platform:'node',format:'esm',packages:'external',jsx:'automatic',write:false});
 const temp=resolve('node_modules/.cache/workflow-ui-'+process.pid+'.mjs');
 await mkdir(resolve('node_modules/.cache'),{recursive:true});
 await writeFile(temp,built.outputFiles[0].text);
@@ -15,21 +15,23 @@ const components=await import(pathToFileURL(temp).href);
 await unlink(temp);
 const profile={id:'staff',full_name:'Billing person',role:'owner',is_active:true};
 const data={profile,staff:[profile],inventory:[{id:'active',model:'Active phone',status:'in_stock',imei_1:'111111111111111',stock_code:'AS-ACTIVE',default_sale_price:120000,purchase_price:98765},{id:'old',model:'Old sold phone',status:'sold',stock_code:'AS-SOLD',purchase_price:90000}],soldPhones:[],accessories:[],customers:[],sales:[],payments:[],saleItems:[]};
-test('Active inventory hides sold phone rows and purchase cost columns',()=>{
+test('Active inventory hides sold rows and shows separate purchase and sale prices to managers',()=>{
   const html=renderToStaticMarkup(React.createElement(components.Inventory,{data,manager:true,busy:false,setModal(){},safe:async fn=>fn(),repair(){}}));
-  assert.match(html,/Active phone/);assert.doesNotMatch(html,/Old sold phone|98765|Purchase price/);assert.match(html,/Sold phones/);assert.match(html,/Price/);
+  assert.match(html,/Active phone/);assert.doesNotMatch(html,/Old sold phone/);assert.match(html,/Sold phones/);assert.match(html,/Purchase cost/);assert.match(html,/98,765/);assert.match(html,/Sale price/);
+  const staff=renderToStaticMarkup(React.createElement(components.Inventory,{data,manager:false,busy:false,setModal(){},safe:async fn=>fn(),repair(){}}));assert.doesNotMatch(staff,/98,765|<th>Purchase cost/);
 });
 test('Checkout displays complete bill summary before payment, with staff and shopkeeper options',()=>{
   const html=renderToStaticMarkup(React.createElement(components.SaleForm,{data,initial:'active'}));
   assert.ok(html.indexOf('Bill summary')<html.indexOf('Payment details'));
   assert.match(html,/Shopkeeper sale/);assert.match(html,/Billing person/);assert.match(html,/Use phone camera/);assert.match(html.match(/<input[^>]*name="customer_mobile"[^>]*>/)?.[0]||'',/required/);
 });
-test('Registered supplier form permits optional photo and pending purchase cost',()=>{
+test('Registered supplier details are optional and phone cost, storage and PTA are required',()=>{
   const html=renderToStaticMarkup(React.createElement(components.PurchaseForm,{suppliers:[],onType(){}}));
   assert.match(html,/Seller photo \(optional\)/);
   const photo=html.match(/<input[^>]*name="photo"[^>]*>/)?.[0];
   const cost=html.match(/<input[^>]*name="purchase_price"[^>]*>/)?.[0];
-  assert.ok(photo);assert.ok(cost);assert.doesNotMatch(photo,/required/);assert.doesNotMatch(cost,/required/);
+  assert.ok(photo);assert.ok(cost);assert.doesNotMatch(photo,/required/);assert.match(cost,/required/);
+  for(const name of ['storage','pta_status'])assert.match(html.match(new RegExp('<select[^>]*name="'+name+'"[^>]*>'))?.[0]||'',/required/);
   for(const name of ['mobile','cnic'])assert.doesNotMatch(html.match(new RegExp('<input[^>]*name="'+name+'"[^>]*>'))?.[0]||'',/required/);
   assert.match(html.match(/<input[^>]*name="supplier_name"[^>]*>/)?.[0]||'',/required/);
 });
@@ -61,4 +63,12 @@ test('Customers list removes a settled contact while CRM retains it for selectab
  assert.match(html,/Pending contact/);assert.doesNotMatch(html,/Settled contact/);
  const crm=renderToStaticMarkup(React.createElement(components.CustomerCRM,{data:input}));
  assert.match(crm,/Select Settled contact/);assert.match(crm,/Select all matching customers/);assert.match(crm,/Prepare selected messages/);assert.match(crm,/iPhone 13/);assert.doesNotMatch(crm,/\[object Object\]/);
+});
+
+test('Both ledger pages show other balances and hide them from salespeople',()=>{
+ const input={...data,ledgerEntries:[{id:'r',kind:'receivable',category:'existing_balance',full_name:'Loan receivable',description:'Old loan',record_date:'2026-10-01',amount:500},{id:'p',kind:'payable',category:'expense_owed',full_name:'Rent payable',description:'Unpaid rent',record_date:'2026-10-01',amount:200}],ledgerPayments:[]};
+ for(const [kind,name,button] of [['receivable','Loan receivable','Add other receivable'],['payable','Rent payable','Add other payable']]){
+  const html=renderToStaticMarkup(React.createElement(components.LedgerPage,{kind,data:input,manager:true,save:async()=>{},setModal(){}}));assert.match(html,new RegExp(name));assert.match(html,new RegExp(button));assert.match(html,/All records \/ history/);
+  const denied=renderToStaticMarkup(React.createElement(components.LedgerPage,{kind,data:input,manager:false,save:async()=>{},setModal(){}}));assert.doesNotMatch(denied,new RegExp(name));assert.match(denied,/Owner or manager access/);
+ }
 });

@@ -51,7 +51,7 @@ Commit or stash your own code changes before pulling. Your ignored local environ
 
 - Dashboard, daily revenue, stock alerts, dues, and owner profit.
 - Phone inventory with IMEI/stock codes, asking prices, battery/PTA information, repair status, barcode/QR labels, and website catalog visibility.
-- Phone and accessory purchases, supplier payments, seller photos, optional pending purchase costs, and per-phone expenses.
+- Phone and accessory purchases, supplier payments, seller photos, required new-phone purchase costs, and per-phone expenses.
 - Phone/accessory sales, customer creation, barcode entry, discounts, partial payments, complimentary lines, invoices and PDF/WhatsApp sharing.
 - Customers and shopkeepers, opening receivables, statements, payment history, and WhatsApp reminders.
 - Supplier ledgers, expenses, daily opening/closing counts, accounting reports, owner-only profit, staff access, audit history, and backup export.
@@ -102,7 +102,7 @@ Run server unit tests with:
 
 ## Practical limits
 
-The requested workflow changes are implemented: dedicated sold-phone archive, IMEI buyback with separate purchase/sale lifecycles, separate supplier directories, optional registered-supplier photos, accessory restocking, shopkeeper sales, billing staff names, full bill summaries, phone-camera scanning, customer details/history and CRM drafts. Walk-in seller photos remain required. Blank phone purchase costs remain pending until set through Purchases. CRM opens a personalized WhatsApp draft for review; it does not automatically broadcast or confirm delivery. Camera scanning needs HTTPS (or localhost) and camera permission; a plain HTTP LAN address does not provide phone camera access. Camera hardware and scanning accuracy must still be checked on the target phone.
+The requested workflow changes are implemented: dedicated sold-phone archive, IMEI buyback with separate purchase/sale lifecycles, separate supplier directories, optional registered-supplier photos, accessory restocking, shopkeeper sales, billing staff names, full bill summaries, phone-camera scanning, customer details/history and CRM drafts. Walk-in seller photos remain required. New phone purchases require storage, PTA status and purchase cost. Older pending-cost records can still be completed through Purchases. CRM opens a personalized WhatsApp draft for review; it does not automatically broadcast or confirm delivery. Camera scanning needs HTTPS (or localhost) and camera permission; a plain HTTP LAN address does not provide phone camera access. Camera hardware and scanning accuracy must still be checked on the target phone.
 
 One individually tracked phone is supported per sale, with accessory/complimentary lines. Returns/refunds, tax handling, transaction reversals, full disaster-recovery restore, and advanced forecasting are not implemented. Historical reconciliation payments post when recorded. Physical scanners and thermal printers have not been tested here.
 
@@ -140,10 +140,25 @@ For an existing installation with the V6 upgrade, apply `supabase/migrations/202
 
 Purchases show the seller name, both available IMEIs, model/storage, total and remaining payable. Search by seller, IMEI, model or purchase number; the Excel export includes these fields. Fully paid purchases show **Paid**, and phones with an unresolved purchase cost show **Cost pending**.
 
-For registered iPhone suppliers, **Seller name** is the only required seller-detail field. Mobile, CNIC and photo are optional; entered mobile/CNIC values must still have valid lengths. Selecting an existing supplier preserves their saved details when optional fields are blank. Model and IMEI remain required phone fields. Walk-in sellers still require their identity details and photo. Apply `supabase/migrations/20261007211606_supplier_optional_details.sql` after the V5 workflow upgrade for the backend validation change.
+For registered iPhone suppliers, **Seller name** is the only required seller-detail field. Mobile, CNIC and photo are optional; entered mobile/CNIC values must still have valid lengths. Selecting an existing supplier preserves their saved details when optional fields are blank. Model, IMEI, storage, PTA status and purchase cost are required phone fields. Walk-in sellers still require their identity details and photo. Apply `supabase/migrations/20261007211606_supplier_optional_details.sql` after the V5 workflow upgrade for the backend validation change.
 
 **Customers** and **Shopkeepers** show only contacts with an outstanding balance across all their invoices and old opening balances. After final payment they disappear from this dues view; saved contacts remain in Customer messages and the sale customer selector. Their original invoices stay in Sales & invoices. Settled opening balances appear there as labeled receipts, keeping their original opening-balance classification and avoiding new sales revenue.
 
 In **Customer messages**, select individual customer checkboxes or **Select all matching**, edit the offer, and click **Prepare selected messages**. Review the selected recipient list, then use **Review next in WhatsApp** to open each personalized draft. Press Send in WhatsApp. Selections remain selected when you change filters; **Clear selection** resets them. The app does not automatically send messages or confirm delivery.
 
 Verification: `npm test`, `npm run build`, and the rollback-only SQL scenarios in `database/verify-supplier-details.sql`.
+
+
+## Other receivables, payables and protected reports
+
+Apply `supabase/migrations/20261007213726_ledgers_costs_owner_locks.sql` after the preceding migrations. This adds both ledgers, requires storage/PTA/purchase cost for new phone purchases, and restricts daily opening/closing to owners. A purchase cost of zero must be explicitly entered; blank costs are rejected. Existing pending-cost history remains available.
+
+Inventory displays purchase cost and sale price for phones, and per-unit purchase cost for accessories, for owners/managers. Purchase costs stay hidden from salespeople. Reports and Daily closing are owner-only; the database also rejects non-owner opening/closing and hides session details. This uses the staff role, without a separate page password.
+
+Owners/managers can open **Receivables ledger** or **Payables ledger** to view invoices/purchases together with non-phone balances. Add the person/business, amount, description, date and optional reference/due date, then receive/pay partial or full amounts. Overpayments are rejected. Fully settled entries remain in **All records / history**. Exports and payment history are available.
+
+Choose the category that reflects the transaction: **Existing balance** records an opening amount against equity; **Money lent / advance** and **Money borrowed / received** move the selected cash/bank account without creating income; **Other service income owed** adds income; **Expense owed** adds an expense. Settlement reduces the corresponding receivable/payable and moves cash/bank. Record dates use Pakistan time and cannot be in the future. Both new ledger tables are included in backups and retained during old-record cleanup.
+
+For a complimentary cable or other stocked accessory, select the inventory accessory and enter zero (or leave its selling price blank) in the invoice. Its quantity reduces stock and its stored purchase cost is captured at the time of sale. Backend invoice profit equals the final customer bill minus all item cost snapshots, including free accessories. The customer bill remains unchanged. Later restocking or purchase-cost changes do not rewrite past profit. The owner **Invoice profit** report displays this result; **Profit per IMEI** also deducts included free-accessory costs.
+
+Verification: `npm test`, `npm run build`, and rollback-only SQL scenarios in `database/verify-ledgers-costs.sql`, `verify-workflows.sql`, `verify-supplier-details.sql` and `verify-cleanup.sql`. Earlier batch verification scripts document older versions and their former optional-cost behavior.

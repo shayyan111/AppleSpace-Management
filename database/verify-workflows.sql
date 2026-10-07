@@ -11,18 +11,18 @@ declare
  cnic text:=floor(1000000000000+random()*8000000000000)::bigint::text;
  req uuid:=gen_random_uuid(); customer_id uuid; original_purchase uuid;
 begin
- p:=public.erp_action(jsonb_build_object('action','purchase','request_id',req,'supplier_name','Workflow test supplier','seller_kind','supplier','cnic',cnic,'mobile','03000000000','model','Workflow first phone','imei_1',imei,'imei_2',second_imei,'purchase_price',100000,'sale_price',120000,'paid',50000));
+ p:=public.erp_action(jsonb_build_object('action','purchase','storage','128GB','pta_status','non_pta','request_id',req,'supplier_name','Workflow test supplier','seller_kind','supplier','cnic',cnic,'mobile','03000000000','model','Workflow first phone','imei_1',imei,'imei_2',second_imei,'purchase_price',100000,'sale_price',120000,'paid',50000));
  first_id:=(p->>'inventory_id')::uuid;original_purchase:=(p->>'id')::uuid;
- walkin:=public.erp_action(jsonb_build_object('action','purchase','request_id',gen_random_uuid(),'supplier_name','Workflow walk-in seller','seller_kind','walk_in','cnic',floor(1000000000000+random()*8000000000000)::bigint::text,'mobile','03000000003','photo_url','verification/photo.jpg','model','Workflow pending cost phone','imei_1',floor(100000000000000+random()*800000000000000)::bigint::text,'purchase_price','','paid',0));
+ walkin:=public.erp_action(jsonb_build_object('action','purchase','storage','128GB','pta_status','non_pta','request_id',gen_random_uuid(),'supplier_name','Workflow walk-in seller','seller_kind','walk_in','cnic',floor(1000000000000+random()*8000000000000)::bigint::text,'mobile','03000000003','photo_url','verification/photo.jpg','model','Workflow required cost phone','imei_1',floor(100000000000000+random()*800000000000000)::bigint::text,'purchase_price',100,'paid',0));
  store:=public.erp_read();
  if exists(select 1 from jsonb_array_elements(store->'suppliers') x where x->>'seller_kind'='walk_in') then raise exception 'Walk-in contact entered supplier directory'; end if;
- if not exists(select 1 from public.inventory_items where id=(walkin->>'inventory_id')::uuid and purchase_cost_pending) then raise exception 'Optional purchase cost lost'; end if;
+ if not exists(select 1 from public.inventory_items where id=(walkin->>'inventory_id')::uuid and not purchase_cost_pending) then raise exception 'Required purchase cost missing'; end if;
  if not exists(select 1 from jsonb_array_elements(store->'walkInSellers') x where x->>'full_name'='Workflow walk-in seller') then raise exception 'Walk-in purchase contact missing'; end if;
  if first_id is null then raise exception 'Purchase missing inventory ID'; end if;
- retry:=public.erp_action(jsonb_build_object('action','purchase','request_id',req));
+ retry:=public.erp_action(jsonb_build_object('action','purchase','storage','128GB','pta_status','non_pta','request_id',req));
  if retry<>p then raise exception 'Purchase retry was not deduplicated'; end if;
  begin
-   perform public.erp_action(jsonb_build_object('action','purchase','request_id',gen_random_uuid(),'supplier_name','Duplicate','cnic',cnic,'mobile','03000000000','model','Duplicate phone','imei_1',second_imei,'purchase_price',100));
+   perform public.erp_action(jsonb_build_object('action','purchase','storage','128GB','pta_status','non_pta','request_id',gen_random_uuid(),'supplier_name','Duplicate','cnic',cnic,'mobile','03000000000','model','Duplicate phone','imei_1',second_imei,'purchase_price',100));
    raise exception 'Active cross-IMEI duplicate accepted';
  exception when others then
    if sqlerrm<>'IMEI or serial already exists in active inventory' then raise; end if;
@@ -39,7 +39,7 @@ begin
  if exists(select 1 from public.website_catalog where inventory_item_id=first_id) then raise exception 'Sold phone still public'; end if;
  if not exists(select 1 from jsonb_array_elements(public.erp_sold_phones()) x where x->>'original_inventory_id'=first_id::text and (x->>'sale_price')::numeric=115000) then raise exception 'Sold archive missing actual sale amount'; end if;
  select sale.customer_id into customer_id from public.sales sale where sale.id=(s->>'id')::uuid;
- buyback:=public.erp_action(jsonb_build_object('action','purchase','request_id',gen_random_uuid(),'supplier_id',(select seller_id from public.purchases where id=original_purchase),'seller_kind','supplier','model','Workflow second phone','imei_1',imei,'imei_2',second_imei,'purchase_price',90000,'sale_price',110000,'paid',0));
+ buyback:=public.erp_action(jsonb_build_object('action','purchase','storage','128GB','pta_status','non_pta','request_id',gen_random_uuid(),'supplier_id',(select seller_id from public.purchases where id=original_purchase),'seller_kind','supplier','model','Workflow second phone','imei_1',imei,'imei_2',second_imei,'purchase_price',90000,'sale_price',110000,'paid',0));
  second_id:=(buyback->>'inventory_id')::uuid;
  if second_id=first_id then raise exception 'Buyback reused historical inventory row'; end if;
  if not exists(select 1 from public.inventory_items where id=first_id and status='sold' and purchase_id=original_purchase and purchase_price=100000 and model='Workflow first phone') then raise exception 'Buyback modified original purchase history'; end if;
