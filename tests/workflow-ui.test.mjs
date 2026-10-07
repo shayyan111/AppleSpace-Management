@@ -7,7 +7,7 @@ import {resolve} from 'node:path';
 import React from 'react';
 import {renderToStaticMarkup} from 'react-dom/server';
 
-const built=await build({stdin:{contents:`export {default as Inventory} from './src/Inventory.tsx'; export {default as SaleForm} from './src/SaleForm.tsx'; export {default as PurchaseForm} from './src/PurchaseForm.tsx'; export {default as CustomerCRM} from './src/CustomerCRM.tsx';`,resolveDir:process.cwd(),loader:'ts'},bundle:true,platform:'node',format:'esm',packages:'external',jsx:'automatic',write:false});
+const built=await build({stdin:{contents:`export {default as RecordCleanup} from './src/RecordCleanup.tsx'; export {default as Inventory} from './src/Inventory.tsx'; export {default as SaleForm} from './src/SaleForm.tsx'; export {default as PurchaseForm} from './src/PurchaseForm.tsx'; export {default as CustomerCRM} from './src/CustomerCRM.tsx';`,resolveDir:process.cwd(),loader:'ts'},bundle:true,platform:'node',format:'esm',packages:'external',jsx:'automatic',write:false});
 const temp=resolve('node_modules/.cache/workflow-ui-'+process.pid+'.mjs');
 await mkdir(resolve('node_modules/.cache'),{recursive:true});
 await writeFile(temp,built.outputFiles[0].text);
@@ -34,4 +34,13 @@ test('Registered supplier form permits optional photo and pending purchase cost'
 test('CRM includes an editable message and a preview without sending messages',()=>{
   const html=renderToStaticMarkup(React.createElement(components.CustomerCRM,{data,customerDue:()=>0}));
   assert.match(html,/Campaign message/);assert.match(html,/Message preview/);assert.match(html,/review before sending/);
+});
+
+test('Cleanup is owner-only and requires a preview before any delete control is displayed',()=>{
+ const props={owner:true,preview:async()=>{},remove:async()=>{},exportBackup:async()=>{},refresh:async()=>{}};
+ const html=renderToStaticMarkup(React.createElement(components.RecordCleanup,props));
+ assert.match(html,/Current year protected/);assert.match(html,/From date \(inclusive\)/);assert.match(html,/To date \(inclusive\)/);assert.match(html,/Preview records/);
+ assert.doesNotMatch(html,/Delete eligible old records/);
+ const denied=renderToStaticMarkup(React.createElement(components.RecordCleanup,{...props,owner:false}));
+ assert.match(denied,/requires an active owner account/);assert.doesNotMatch(denied,/type="date"|Preview records/);
 });

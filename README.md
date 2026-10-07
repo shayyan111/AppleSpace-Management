@@ -123,3 +123,15 @@ docker run --rm -p 8080:80 applespace-erp
 ```
 
 A remote optional API server needs HTTPS and explicit frontend origins. This repository import does not deploy a public website.
+
+## Delete old records
+
+Owners can open **Record cleanup** from the sidebar and choose **From date** and **To date** (both inclusive, Pakistan time). Click **Preview records** to review eligible and protected counts, then type the displayed confirmation to delete eligible history. Managers and salespeople cannot use either cleanup endpoint.
+
+The date range must end before January 1 of the ongoing year. This rule is enforced in the database as well as the page, and advances automatically each year. Current-year invoices, payments, expenses, stock and sessions remain protected. Old invoices with newer/out-of-range payments or child records are skipped. Purchases supporting retained stock or unpaid supplier balances remain saved; unpaid invoices, active stock, master contacts, staff, ledger entries and audit history are retained.
+
+Cleanup removes eligible invoices and their line items/payments/cost snapshots, fully settled purchases and supplier payments, old sold-phone history/inventory where dependencies permit, expenses and closed daily sessions. A preview token detects changes to the eligible records before deletion; retrying the same completed request returns the original result. A snapshot is saved before anything is deleted. Use **Export backup before deletion** after cleanup, or export it from **Settings → Recent snapshots**. Snapshots have the existing 30-day retention; exported JSON excludes photo binaries and Auth credentials. Restoration requires a reviewed database import; there is no one-click undo. Image database rows may be removed, but storage files are retained.
+
+Ledger entries are preserved to maintain cash, receivable, payable and account totals. History-based reports and CRM purchase history will omit the deleted details. Export historical reports before cleanup if you need to retain those breakdowns.
+
+For an existing installation with the V6 upgrade, apply `supabase/migrations/20261007210231_record_cleanup.sql`. This incremental migration depends on the earlier SQL in `database/`; it is not a fresh-database bootstrap. Verify using `database/verify-cleanup.sql` in a SQL editor: all fixtures, deletions and backups in that verification transaction are rolled back. Frontend checks: `npm test` and `npm run build`.
