@@ -7,14 +7,14 @@ import {resolve} from 'node:path';
 import React from 'react';
 import {renderToStaticMarkup} from 'react-dom/server';
 
-const built=await build({stdin:{contents:`export {default as LedgerPage} from './src/LedgerPage.tsx'; export {default as Purchases} from './src/Purchases.tsx'; export {default as Customers} from './src/Customers.tsx'; export {default as RecordCleanup} from './src/RecordCleanup.tsx'; export {default as Inventory} from './src/Inventory.tsx'; export {default as SaleForm} from './src/SaleForm.tsx'; export {default as PurchaseForm} from './src/PurchaseForm.tsx'; export {default as CustomerCRM} from './src/CustomerCRM.tsx';`,resolveDir:process.cwd(),loader:'ts'},bundle:true,platform:'node',format:'esm',packages:'external',jsx:'automatic',write:false});
+const built=await build({stdin:{contents:`export {default as ExpenseForm} from './src/ExpenseForm.tsx'; export {default as LabelForm} from './src/LabelForm.tsx'; export {default as LedgerPage} from './src/LedgerPage.tsx'; export {default as Purchases} from './src/Purchases.tsx'; export {default as Customers} from './src/Customers.tsx'; export {default as RecordCleanup} from './src/RecordCleanup.tsx'; export {default as Inventory} from './src/Inventory.tsx'; export {default as SaleForm} from './src/SaleForm.tsx'; export {default as PurchaseForm} from './src/PurchaseForm.tsx'; export {default as CustomerCRM} from './src/CustomerCRM.tsx';`,resolveDir:process.cwd(),loader:'ts'},bundle:true,platform:'node',format:'esm',packages:'external',jsx:'automatic',write:false});
 const temp=resolve('node_modules/.cache/workflow-ui-'+process.pid+'.mjs');
 await mkdir(resolve('node_modules/.cache'),{recursive:true});
 await writeFile(temp,built.outputFiles[0].text);
 const components=await import(pathToFileURL(temp).href);
 await unlink(temp);
 const profile={id:'staff',full_name:'Billing person',role:'owner',is_active:true};
-const data={profile,staff:[profile],inventory:[{id:'active',model:'Active phone',status:'in_stock',imei_1:'111111111111111',stock_code:'AS-ACTIVE',default_sale_price:120000,purchase_price:98765},{id:'old',model:'Old sold phone',status:'sold',stock_code:'AS-SOLD',purchase_price:90000}],soldPhones:[],accessories:[],customers:[],sales:[],payments:[],saleItems:[]};
+const data={profile,staff:[profile],inventory:[{id:'active',model:'Active phone',pta_status:'non_pta',status:'in_stock',imei_1:'111111111111111',stock_code:'AS-ACTIVE',default_sale_price:120000,purchase_price:98765},{id:'old',model:'Old sold phone',status:'sold',stock_code:'AS-SOLD',purchase_price:90000}],soldPhones:[],accessories:[],customers:[],sales:[],payments:[],saleItems:[]};
 test('Active inventory hides sold rows and shows separate purchase and sale prices to managers',()=>{
   const html=renderToStaticMarkup(React.createElement(components.Inventory,{data,manager:true,busy:false,setModal(){},safe:async fn=>fn(),repair(){}}));
   assert.match(html,/Active phone/);assert.doesNotMatch(html,/Old sold phone/);assert.match(html,/Sold phones/);assert.match(html,/Purchase cost/);assert.match(html,/98,765/);assert.match(html,/Sale price/);
@@ -23,7 +23,7 @@ test('Active inventory hides sold rows and shows separate purchase and sale pric
 test('Checkout displays complete bill summary before payment, with staff and shopkeeper options',()=>{
   const html=renderToStaticMarkup(React.createElement(components.SaleForm,{data,initial:'active'}));
   assert.ok(html.indexOf('Bill summary')<html.indexOf('Payment details'));
-  assert.match(html,/Shopkeeper sale/);assert.match(html,/Billing person/);assert.match(html,/Use phone camera/);assert.match(html.match(/<input[^>]*name="customer_mobile"[^>]*>/)?.[0]||'',/required/);
+  assert.match(html,/Shopkeeper sale/);assert.match(html,/Billing person/);assert.match(html.match(/<input[^>]*name="billed_by_name"[^>]*>/)?.[0]||'',/required/);assert.doesNotMatch(html,/<select[^>]*name="billed_by"/);assert.match(html,/PTA: Non-PTA/);assert.match(html,/IMEI: 111111111111111/);assert.match(html,/Use phone camera/);assert.match(html.match(/<input[^>]*name="customer_mobile"[^>]*>/)?.[0]||'',/required/);
 });
 test('Registered supplier details are optional and phone cost, storage and PTA are required',()=>{
   const html=renderToStaticMarkup(React.createElement(components.PurchaseForm,{suppliers:[],onType(){}}));
@@ -31,6 +31,7 @@ test('Registered supplier details are optional and phone cost, storage and PTA a
   const photo=html.match(/<input[^>]*name="photo"[^>]*>/)?.[0];
   const cost=html.match(/<input[^>]*name="purchase_price"[^>]*>/)?.[0];
   assert.ok(photo);assert.ok(cost);assert.doesNotMatch(photo,/required/);assert.match(cost,/required/);
+  assert.match(html.match(/<input[^>]*name="paid"[^>]*>/)?.[0]||'',/required/);
   for(const name of ['storage','pta_status'])assert.match(html.match(new RegExp('<select[^>]*name="'+name+'"[^>]*>'))?.[0]||'',/required/);
   for(const name of ['mobile','cnic'])assert.doesNotMatch(html.match(new RegExp('<input[^>]*name="'+name+'"[^>]*>'))?.[0]||'',/required/);
   assert.match(html.match(/<input[^>]*name="supplier_name"[^>]*>/)?.[0]||'',/required/);
@@ -71,4 +72,13 @@ test('Both ledger pages show other balances and hide them from salespeople',()=>
   const html=renderToStaticMarkup(React.createElement(components.LedgerPage,{kind,data:input,manager:true,save:async()=>{},setModal(){}}));assert.match(html,new RegExp(name));assert.match(html,new RegExp(button));assert.match(html,/All records \/ history/);
   const denied=renderToStaticMarkup(React.createElement(components.LedgerPage,{kind,data:input,manager:false,save:async()=>{},setModal(){}}));assert.doesNotMatch(denied,new RegExp(name));assert.match(denied,/Owner or manager access/);
  }
+});
+
+test('Expense description is required only for Other categories',()=>{
+ for(const [phone,category,required] of [[false,'Rent',false],[false,'Other',true],[true,'Repair',false],[true,'Other phone expense',true]]){
+  const html=renderToStaticMarkup(React.createElement(components.ExpenseForm,{phone,initialCategory:category}));const input=html.match(/<input[^>]*name="description"[^>]*>/)?.[0]||'';if(required)assert.match(input,/required/);else assert.doesNotMatch(input,/required/);
+ }
+});
+test('Accessory label form defaults to the stock quantity for identical copies',()=>{
+ const html=renderToStaticMarkup(React.createElement(components.LabelForm,{item:{name:'Cable',quantity:100},accessory:true,safe:async f=>f()}));assert.match(html,/value="100"/);assert.match(html,/same accessory SKU/);assert.doesNotMatch(html,/Include battery health/);
 });

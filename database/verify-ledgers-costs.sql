@@ -9,7 +9,7 @@ declare today date:=(now() at time zone 'Asia/Karachi')::date; r jsonb; receipt 
  mode text; before_cash numeric; after_cash numeric; income_before numeric; expense_before numeric; store jsonb; snapshot jsonb;
  owner_id uuid:=auth.uid(); field_name text; purchase_payload jsonb;
 begin
- purchase_payload:=jsonb_build_object('action','purchase','request_id',gen_random_uuid(),'supplier_name','Required fields test','seller_kind','supplier','model','Required phone','imei_1',floor(100000000000000+random()*800000000000000)::bigint::text,'storage','128GB','pta_status','non_pta','purchase_price',100);
+ purchase_payload:=jsonb_build_object('action','purchase','paid',0,'request_id',gen_random_uuid(),'supplier_name','Required fields test','seller_kind','supplier','model','Required phone','imei_1',floor(100000000000000+random()*800000000000000)::bigint::text,'storage','128GB','pta_status','non_pta','purchase_price',100);
  foreach field_name in array array['storage','pta_status','purchase_price'] loop
   begin
    perform public.erp_action(purchase_payload-field_name);raise exception 'Missing required purchase field accepted';
@@ -54,7 +54,7 @@ begin
   perform public.erp_action(jsonb_build_object('action','ledger_entry','request_id',gen_random_uuid(),'kind','receivable','full_name','Future entry','category','existing_balance','description','Invalid','record_date',today+1,'amount',10));raise exception 'Future record accepted';
  exception when others then if sqlerrm<>'Choose a valid record date and due date' then raise; end if; end;
  -- Full checkout with two complimentary cables: billed amount stays 120000, COGS is 100800.
- phone:=public.erp_action(jsonb_build_object('action','purchase','storage','128GB','pta_status','non_pta','request_id',gen_random_uuid(),'supplier_name','Ledger phone supplier','seller_kind','supplier','model','Ledger cost test phone','imei_1',floor(100000000000000+random()*800000000000000)::bigint::text,'purchase_price',100000,'paid',0));
+ phone:=public.erp_action(jsonb_build_object('action','purchase','paid',0,'storage','128GB','pta_status','non_pta','request_id',gen_random_uuid(),'supplier_name','Ledger phone supplier','seller_kind','supplier','model','Ledger cost test phone','imei_1',floor(100000000000000+random()*800000000000000)::bigint::text,'purchase_price',100000,'paid',0));
  accessory:=public.erp_action(jsonb_build_object('action','accessory_purchase','request_id',gen_random_uuid(),'supplier_name','Ledger cable supplier','name','Ledger test cable','quantity',4,'purchase_price',400,'sale_price',700,'paid',0));accessory_id:=(accessory->>'inventory_id')::uuid;
  invoice:=public.erp_action(jsonb_build_object('action','sale','request_id',gen_random_uuid(),'inventory_id',phone->>'inventory_id','price',120000,'paid',120000,'customer_name','Complimentary cable test','customer_mobile','03000000005','billed_by',owner_id,'extras',jsonb_build_array(jsonb_build_object('accessory_id',accessory_id,'name','Ledger test cable','quantity',2,'price',''))));
  if not exists(select 1 from public.sales where id=(invoice->>'id')::uuid and final_total=120000) then raise exception 'Complimentary accessory changed bill'; end if;
@@ -63,8 +63,8 @@ begin
  if not exists(select 1 from public.erp_journals j join public.erp_journal_lines l on l.journal_id=j.id where j.source_id=(invoice->>'id')::uuid and j.source_type='sale' and l.account_code='5000' and l.debit=100800) then raise exception 'Backend COGS posting wrong'; end if;
  store:=public.erp_read();
  if not exists(select 1 from jsonb_array_elements(store->'invoiceProfits') p where p->>'sale_id'=invoice->>'id' and (p->>'gross_profit')::numeric=19200 and (p->>'purchase_cost')::numeric=100800) then raise exception 'Backend invoice profit wrong'; end if;
- -- A subsequent restock changes average purchase cost, but old invoice cost snapshots stay fixed.
- perform public.erp_action(jsonb_build_object('action','accessory_restock','request_id',gen_random_uuid(),'accessory_id',accessory_id,'supplier_name','Ledger second cable supplier','quantity',2,'purchase_price',800,'paid',0));
+ -- Restocking reuses saved purchase cost and keeps historical cost snapshots fixed.
+ perform public.erp_action(jsonb_build_object('action','accessory_restock','request_id',gen_random_uuid(),'accessory_id',accessory_id,'supplier_name','Ledger second cable supplier','quantity',2,'paid',0));
  store:=public.erp_read();
  if not exists(select 1 from jsonb_array_elements(store->'invoiceProfits') p where p->>'sale_id'=invoice->>'id' and (p->>'gross_profit')::numeric=19200) then raise exception 'Restock changed historical profit'; end if;
  if not (store ? 'ledgerEntries') or not (store ? 'sessions') then raise exception 'Owner read missing data'; end if;

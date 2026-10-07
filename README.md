@@ -155,10 +155,25 @@ Apply `supabase/migrations/20261007213726_ledgers_costs_owner_locks.sql` after t
 
 Inventory displays purchase cost and sale price for phones, and per-unit purchase cost for accessories, for owners/managers. Purchase costs stay hidden from salespeople. Reports and Daily closing are owner-only; the database also rejects non-owner opening/closing and hides session details. This uses the staff role, without a separate page password.
 
-Owners/managers can open **Receivables ledger** or **Payables ledger** to view invoices/purchases together with non-phone balances. Add the person/business, amount, description, date and optional reference/due date, then receive/pay partial or full amounts. Overpayments are rejected. Fully settled entries remain in **All records / history**. Exports and payment history are available.
+Owners/managers can open **Receivables ledger** or **Payables ledger** to view invoices/purchases together with non-phone balances. Add the person/business, amount, date and optional description/reference/due date, then receive/pay partial or full amounts. Overpayments are rejected. Fully settled entries remain in **All records / history**. Exports and payment history are available.
 
 Choose the category that reflects the transaction: **Existing balance** records an opening amount against equity; **Money lent / advance** and **Money borrowed / received** move the selected cash/bank account without creating income; **Other service income owed** adds income; **Expense owed** adds an expense. Settlement reduces the corresponding receivable/payable and moves cash/bank. Record dates use Pakistan time and cannot be in the future. Both new ledger tables are included in backups and retained during old-record cleanup.
 
 For a complimentary cable or other stocked accessory, select the inventory accessory and enter zero (or leave its selling price blank) in the invoice. Its quantity reduces stock and its stored purchase cost is captured at the time of sale. Backend invoice profit equals the final customer bill minus all item cost snapshots, including free accessories. The customer bill remains unchanged. Later restocking or purchase-cost changes do not rewrite past profit. The owner **Invoice profit** report displays this result; **Profit per IMEI** also deducts included free-accessory costs.
 
 Verification: `npm test`, `npm run build`, and rollback-only SQL scenarios in `database/verify-ledgers-costs.sql`, `verify-workflows.sql`, `verify-supplier-details.sql` and `verify-cleanup.sql`. Earlier batch verification scripts document older versions and their former optional-cost behavior.
+
+
+## Compact labels, invoice details and simpler entry
+
+Apply `supabase/migrations/20261007221937_invoice_labels_validation.sql` after the ledger migration. Receivable/payable descriptions are optional. Expense descriptions are required only for **Other** (including **Other phone expense**); other categories accept blank descriptions. **Paid now** is required for phone/accessory purchases and quantity additions: enter `0` when nothing has been paid.
+
+**Inventory → Accessories → Add quantity** uses the saved unit purchase cost, without asking for a new cost, and posts the corresponding stock/purchase payable. It preserves the SKU and historical invoice costs. The supplier defaults to the accessory's existing supplier.
+
+Choose **Label / Labels** in Inventory, or find a phone/accessory in **Labels & scanner**, then select the number of identical labels. Labels are 50 × 30 mm with a smaller QR and Code128 barcode. Phone labels show model/storage, PTA status, IMEI (and IMEI 2 when present), with optional recorded battery health. Every accessory copy uses the same SKU; printing 100 copies produces the same label for 100 cables. Print at actual size with browser headers/footers off and matching paper dimensions; physical printer/scanner verification remains device-specific.
+
+**Bill made by** accepts a typed name, defaulting to the signed-in staff name. The authenticated staff account remains the audit actor. Checkout summaries, printed/PDF invoices and WhatsApp invoice messages include model, PTA status, IMEI, storage and recorded battery health. Phone details are saved on the sale item so later inventory edits do not alter invoice history.
+
+In **Sales & invoices**, the **WhatsApp** button opens the saved customer's chat with the invoice text, phone details, billing name, total, received amount and balance ready to send. Press Send in WhatsApp. **Share invoice PDF** uses the device share sheet when supported; on desktop, it downloads the PDF and opens WhatsApp for manual attachment. The app does not automatically deliver messages or attach PDFs through WhatsApp Web.
+
+Verification adds invoice/message/label generation tests and `database/verify-invoice-labels.sql`, using rollback-only fixtures.

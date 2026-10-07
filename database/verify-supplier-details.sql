@@ -8,12 +8,12 @@ declare p jsonb; p2 jsonb; s jsonb; legacy jsonb; seller_id uuid; customer_id uu
  cnic text:=floor(1000000000000+random()*8000000000000)::bigint::text;
  imei text:=floor(100000000000000+random()*800000000000000)::bigint::text; base jsonb; mode text;
 begin
- base:=jsonb_build_object('action','purchase','storage','128GB','pta_status','non_pta','seller_kind','supplier','supplier_name','Name-only supplier test','model','Test iPhone','imei_1',imei,'purchase_price',100,'paid',40);
+ base:=jsonb_build_object('action','purchase','paid',0,'storage','128GB','pta_status','non_pta','seller_kind','supplier','supplier_name','Name-only supplier test','model','Test iPhone','imei_1',imei,'purchase_price',100,'paid',40);
  p:=public.erp_action(base||jsonb_build_object('request_id',req));
  select purchase_row.seller_id into seller_id from public.purchases purchase_row where id=(p->>'id')::uuid;
  if not exists(select 1 from public.sellers t where t.id=supplier_test.seller_id and t.full_name='Name-only supplier test' and t.cnic is null and t.mobile is null and t.photo_url is null) then raise exception 'Name-only supplier purchase failed'; end if;
  if (select total_amount from public.purchases where id=(p->>'id')::uuid)-(select sum(amount) from public.supplier_payments where purchase_id=(p->>'id')::uuid)<>60 then raise exception 'Payable incorrect'; end if;
- p2:=public.erp_action(jsonb_build_object('action','purchase','storage','128GB','pta_status','non_pta','request_id',gen_random_uuid(),'seller_kind','supplier','supplier_id',seller_id,'mobile','','cnic','','model','Another test iPhone','imei_1',floor(100000000000000+random()*800000000000000)::bigint::text,'purchase_price',100,'paid',0));
+ p2:=public.erp_action(jsonb_build_object('action','purchase','paid',0,'storage','128GB','pta_status','non_pta','request_id',gen_random_uuid(),'seller_kind','supplier','supplier_id',seller_id,'mobile','','cnic','','model','Another test iPhone','imei_1',floor(100000000000000+random()*800000000000000)::bigint::text,'purchase_price',100,'paid',0));
  if public.erp_action(base||jsonb_build_object('request_id',req))<>p then raise exception 'Purchase retry not idempotent'; end if;
  -- Multiple new suppliers with blank optional details must not collide on CNIC uniqueness.
  perform public.erp_action((base-'imei_1')||jsonb_build_object('request_id',gen_random_uuid(),'supplier_name','Second name-only supplier','cnic',' ','mobile',' ','imei_1',floor(100000000000000+random()*800000000000000)::bigint::text));

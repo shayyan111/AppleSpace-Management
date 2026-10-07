@@ -1,3 +1,14 @@
+## Simpler entries, compact labels and invoice sharing
+
+- Made receivable/payable descriptions optional and expense descriptions required only for Other categories.
+- Accessory quantity additions reuse the saved purchase cost; added identical accessory labels with selectable copy counts.
+- Added compact 50 × 30 mm phone/accessory labels with smaller QR/barcode, IMEI/PTA details and optional health.
+- Saved phone details on invoice items and displayed them in checkout, print/PDF and WhatsApp messages.
+- Replaced the billing staff selector with a typed billing name while preserving the authenticated audit actor.
+- Added a dedicated customer WhatsApp invoice action alongside PDF sharing.
+- Required Paid now for phone/accessory purchases and quantity additions, allowing explicit zero payments.
+- Added output/UI checks and rollback-only database regression scenarios.
+
 ## Purchase requirements, ledgers and owner locks
 
 - New iPhone purchases require storage, PTA status and purchase cost in the form and database; registered supplier identity details remain optional except name.
