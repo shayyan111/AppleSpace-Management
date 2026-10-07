@@ -1,6 +1,6 @@
 # AppleSpace Management
 
-AppleSpace store ERP built with React, TypeScript and Vite, using the existing shared Supabase database. This repository imports the latest `AppleSpace-ERP-Updated(1).zip` and adds a grey/charcoal interface, repeatable setup, VS Code tasks, and automated checks.
+AppleSpace store ERP built with React, TypeScript and Vite, using the existing shared Supabase database. This repository includes the workflow upgrades from V6.1, a grey/charcoal interface, repeatable setup, VS Code tasks, and automated checks. See [IMPLEMENTED-CHANGES.md](IMPLEMENTED-CHANGES.md) for the requested changes.
 
 ## Open in VS Code on Windows
 
@@ -57,13 +57,13 @@ Commit or stash your own code changes before pulling. Your ignored local environ
 - Supplier ledgers, expenses, daily opening/closing counts, accounting reports, owner-only profit, staff access, audit history, and backup export.
 - Built-in store analytics assistant and an optional Python AI server.
 
-See [CHANGES.md](CHANGES.md) for the four batches included in the imported version. Sales remove published phones from the shared website catalog transactionally; the website must read that catalog to show the changes.
+See [CHANGES.md](CHANGES.md) for the full change history. Sales remove published phones from the shared website catalog transactionally; the website must read that catalog to show the changes.
 
 ## Existing database
 
 This application uses the existing AppleSpace database, not an empty local database. Core ERP RPCs (`erp_read`, `erp_action`, `erp_get_backup`) and row security on the principal business tables were confirmed during this repository import.
 
-The SQL files in `database/` are upgrade history and verification scripts for the earlier schema. **Do not run them all on your existing project, and do not treat them as a fresh-project bootstrap.** No schema migration is required to open this import. No business transactions were created during the import.
+The SQL files in `database/` are upgrade history and verification scripts for the earlier schema. **Do not run them all on your existing project, and do not treat them as a fresh-project bootstrap.** The V5/V6 workflow upgrade has been applied to the connected project. Do not rerun its SQL files. Verification transactions were rolled back; existing business records were retained.
 
 ## Checks
 
@@ -74,7 +74,7 @@ npm.cmd run build
 
 GitHub Actions runs the frontend checks and optional server unit tests after pushes and pull requests. These checks do not use an account password or write to the store database.
 
-The database verification scripts contain rollback tests and assume the original owner UUID. Review them and choose a suitable test environment before running them. Some older batch tests target older function behavior.
+The database verification scripts contain rollback tests and assume the original owner UUID. Review them and choose a suitable test environment before running them. Some older batch tests target older function behavior. `database/verify-workflows.sql` covers current purchases, sales, repeated buybacks, archive prices, restocking, old balances and staff permissions, entirely within a rollback.
 
 ## Optional AI server
 
@@ -102,7 +102,7 @@ Run server unit tests with:
 
 ## Practical limits
 
-This imports the current ERP version; it does not claim to complete every later requested feature. Dedicated sold-phone history, IMEI buyback/reactivation, separate accessory supplier lists, phone-camera sales scanning, and a full customer campaigns page still need further implementation. The current purchase batch requires seller CNIC/mobile/photo; changing requirements for registered suppliers also remains pending.
+The requested workflow changes are implemented: dedicated sold-phone archive, IMEI buyback with separate purchase/sale lifecycles, separate supplier directories, optional registered-supplier photos, accessory restocking, shopkeeper sales, billing staff names, full bill summaries, phone-camera scanning, customer details/history and CRM drafts. Walk-in seller photos remain required. Blank phone purchase costs remain pending until set through Purchases. CRM opens a personalized WhatsApp draft for review; it does not automatically broadcast or confirm delivery. Camera scanning needs HTTPS (or localhost) and camera permission; a plain HTTP LAN address does not provide phone camera access. Camera hardware and scanning accuracy must still be checked on the target phone.
 
 One individually tracked phone is supported per sale, with accessory/complimentary lines. Returns/refunds, tax handling, transaction reversals, full disaster-recovery restore, and advanced forecasting are not implemented. Historical reconciliation payments post when recorded. Physical scanners and thermal printers have not been tested here.
 
