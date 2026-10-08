@@ -19,7 +19,7 @@ function dom(){let html='',opened='';class Element{constructor(name){this.nodeNa
 }
 test('WhatsApp invoice includes immutable phone details, billing name, totals and included accessories',()=>{
  const message=details.invoiceMessage(sale,items,payments,customer,[{id:'p',model:'Edited later',pta_status:'pta_approved'}]);
- for(const text of ['iPhone 15','Non-PTA','111111111111111','222222222222222','91%','Typed billing name','Cable — Included','20,000'])assert.ok(message.includes(text));assert.doesNotMatch(message,/Edited later|purchase_price/);
+ for(const text of ['iPhone 15','Non-PTA','111111111111111','222222222222222','Typed billing name','Cable — Included','20,000'])assert.ok(message.includes(text));assert.doesNotMatch(message,/Edited later|purchase_price|Battery health|91%|PTA:/);
  const browser=dom();try{output.sendInvoiceWhatsApp(sale,items,payments,customer,[]);const url=new URL(browser.opened());assert.equal(url.pathname,'/923000000001');assert.equal(url.searchParams.get('text'),message);}finally{browser.restore()}
 });
 test('Printed invoice includes PTA, both IMEIs and snapshot details with escaped customer input',async()=>{
@@ -50,7 +50,7 @@ test('Balance reminder states the amount and reference without sending anything'
 
 
 test('Borderless invoice uses a white page with a logo watermark behind the details and no seller signature',()=>{
- const pages=forms.saleFormPages(sale,items,payments,customer,[]);const html=forms.formsHTML(pages);assert.doesNotMatch(html,/<line|<rect|<table|form-background|Seller signature/);assert.match(forms.formsCSS,/background:#fff/);for(const p of pages){const watermark=p.elements.find(e=>e.alt==='AppleSpace logo watermark'),header=p.elements.find(e=>e.alt==='AppleSpace logo');assert.ok(watermark&&watermark.opacity>0&&watermark.opacity<.2);assert.equal(header.url,watermark.url);assert.ok(p.elements.indexOf(watermark)<p.elements.findIndex(e=>e.text==='PRODUCT'));}assert.ok(html.indexOf('AppleSpace logo watermark')<html.indexOf('<svg'));assert.match(html,/opacity:0.14/);
+ const pages=forms.saleFormPages(sale,items,payments,customer,[]);const html=forms.formsHTML(pages);assert.doesNotMatch(html,/<line|<rect|<table|form-background|Seller signature/);assert.match(forms.formsCSS,/background:#fff/);for(const p of pages){const watermark=p.elements.find(e=>e.alt==='AppleSpace logo watermark'),header=p.elements.find(e=>e.alt==='AppleSpace logo');assert.ok(watermark&&watermark.opacity>0&&watermark.opacity<.2);assert.equal(header.url,watermark.url);assert.ok(p.elements.indexOf(watermark)<p.elements.findIndex(e=>e.text==='PRODUCT'));}assert.ok(html.indexOf('AppleSpace logo watermark')<html.indexOf('<svg'));assert.match(html,/opacity:0.08/);
 });
 test('Purchase slip prints one main seller section and embeds a saved photo into the PDF',async()=>{
  const url='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aX1EAAAAASUVORK5CYII=';
@@ -64,4 +64,52 @@ test('Long invoice and purchase details paginate inside the content area without
 
 test('Both document headers include the logo, business name and top-right business contacts',()=>{
  const purchase={id:'p',purchase_number:19,purchase_date:'2026-10-08',total_amount:100000,item_details:[snapshot]};for(const pages of [forms.saleFormPages(sale,items,payments,customer,[]),forms.purchaseFormPages(purchase,[],{full_name:'Seller'},[])]){for(const p of pages){assert.ok(p.elements.some(e=>e.alt==='AppleSpace logo'));assert.ok(p.elements.some(e=>e.text==='APPLE SPACE'));for(const value of ['Sharoz Abbasi','+92 334 5136382','Saad Ali Awan','+92 311 5701370'])assert.ok(p.elements.some(e=>e.text===value&&e.x>390&&e.y<110));}}const purchaseTexts=forms.purchaseFormPages(purchase,[],{},[])[0].elements.map(e=>e.text).join('\n');assert.match(purchaseTexts,/Seller signature/);assert.doesNotMatch(purchaseTexts,/seller receipt/i);
+});
+
+test('All invoice formats use standalone PTA statuses and omit recorded battery health',()=>{
+ for(const [status,label] of [['non_pta','Non-PTA'],['jv','JV'],['pta_approved','PTA Approved']]){
+  const invoiceItems=[{...items[0],phone_details:{...snapshot,pta_status:status}}];
+  const pages=forms.saleFormPages(sale,invoiceItems,payments,customer,[]);
+  const texts=pages.flatMap(p=>p.elements.filter(e=>e.type==='text').map(e=>e.text));
+  assert.ok(texts.includes(label));assert.doesNotMatch(texts.join('\n'),/PTA:|Battery health|91%/);
+  const message=details.invoiceMessage(sale,invoiceItems,payments,customer,[]);
+  assert.ok(message.split('\n').includes(label));assert.doesNotMatch(message,/PTA:|Battery health|91%/);
+ }
+});
+
+test('Purchase dates are labeled, unambiguous and use the Pakistan calendar day',()=>{
+ assert.equal(forms.documentDate('2026-10-08'),'08 Oct 2026');
+ assert.equal(forms.documentDate('2026-10-07T20:35:00Z'),'08 Oct 2026');
+ assert.equal(forms.documentDate('2026-10-07T18:35:00Z'),'07 Oct 2026');
+ assert.equal(forms.documentDate('invalid'),'—');assert.equal(forms.documentDate(null),'—');
+ const pages=forms.purchaseFormPages({id:'p',purchase_number:1,purchase_date:'2026-10-07T20:35:00Z',total_amount:100,item_details:[snapshot]},[],{},[]);
+ assert.ok(pages.every(p=>p.elements.some(e=>e.text==='Date: 08 Oct 2026')));
+});
+
+test('Purchase slip reserves clear writing space for seller, thumbprint and buyer on every page',()=>{
+ const purchase={id:'p',purchase_number:1,purchase_date:'2026-10-08',total_amount:100,item_details:[{...snapshot,warranty_notes:'Extended details '.repeat(100)}]};
+ const payments=['cash','bank_transfer','card','jazzcash','easypaisa'].map(method=>({purchase_id:'p',method,amount:1}));
+ for(const p of forms.purchaseFormPages(purchase,[],{},payments)){
+  const signatures=p.elements.filter(e=>['Seller signature','Seller thumbprint',"Buyer's signature"].includes(e.text));
+  assert.equal(signatures.length,3);
+  const content=p.elements.filter(e=>e.type==='text'&&e.y<signatures[0].y);
+  const bottom=Math.max(...content.map(e=>e.y));
+  assert.ok(signatures.every(e=>e.y-bottom>=70));
+  assert.ok(signatures[1].x-(signatures[0].x+signatures[0].width)>=40);
+  assert.ok(signatures[2].x-(signatures[1].x+signatures[1].width)>=40);
+ }
+});
+
+test('Print and PDF logos render black without changing seller photos or logo transparency',async()=>{
+ const pages=forms.purchaseFormPages({id:'p',purchase_number:1,purchase_date:'2026-10-08',total_amount:100,item_details:[snapshot]},[],{print_photo_url:'data:image/png;base64,photo'},[]);
+ const p=pages[0],header=p.elements.find(e=>e.alt==='AppleSpace logo'),watermark=p.elements.find(e=>e.alt==='AppleSpace logo watermark'),photo=p.elements.find(e=>e.alt==='Seller photo');
+ assert.equal(header.monochrome,true);assert.equal(watermark.monochrome,true);assert.ok(!photo.monochrome);
+ assert.ok(header.width>112&&header.height>81);
+ const html=forms.formsHTML(pages);assert.equal((html.match(/filter:brightness\(0\)/g)||[]).length,2);
+ const {default:module}=await import('@pdf-lib/upng');const UPNG=module.default??module;
+ const original=UPNG.decode(await (await fetch(header.url)).arrayBuffer());
+ const rendered=UPNG.decode((await forms.monochromePNG(new Uint8Array(await (await fetch(header.url)).arrayBuffer()))).buffer);
+ assert.equal(rendered.width,original.width);assert.equal(rendered.height,original.height);
+ const before=new Uint8Array(UPNG.toRGBA8(original)[0]),after=new Uint8Array(UPNG.toRGBA8(rendered)[0]);
+ for(let i=0;i<before.length;i+=4){assert.equal(after[i],0);assert.equal(after[i+1],0);assert.equal(after[i+2],0);assert.equal(after[i+3],before[i+3]);}
 });
