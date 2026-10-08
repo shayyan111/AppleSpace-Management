@@ -1,10 +1,11 @@
+import {download} from './browserActions';
+export {download,whatsapp,whatsappNumber,canShareInvoicePDF,sendInvoiceWhatsApp} from './browserActions';
 import JsBarcode from 'jsbarcode';
 import QRCode from 'qrcode';
 import {ptaName} from './invoiceDetails';
 import {saleFormPages,purchaseFormPages,formsHTML,formsCSS,formsPDF,printablePhoto} from './documentForms';
 import {labelCSS,defaultLabelSize,type LabelSize} from './labelLayout';
 const esc=(v:unknown)=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]!));
-export function download(name:string,data:BlobPart,type='application/json'){const url=URL.createObjectURL(new Blob([data],{type}));const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
 export async function exportRows(name:string,rows:any[],format:'csv'|'xlsx'){
  if(!rows.length)throw Error('No records to export.');
  const keys=Object.keys(rows[0]).filter(k=>typeof rows[0][k]!=='object');
@@ -26,19 +27,4 @@ export function printInvoice(sale:any,items:any[],payments:any[],customer:any,ph
 export async function printSlip(purchase:any,items:any[],supplier:any,payments:any[],accessories:any[]=[]){const seller={...supplier};if(seller.print_photo_url)seller.print_photo_url=await printablePhoto(seller.print_photo_url);printHTML(formsHTML(purchaseFormPages(purchase,items,seller,payments,accessories)),'Purchase slip #'+purchase.purchase_number,formsCSS);}
 export async function purchaseSlipPDF(purchase:any,items:any[],supplier:any,payments:any[],accessories:any[]=[]){const seller={...supplier};if(seller.print_photo_url)seller.print_photo_url=await printablePhoto(seller.print_photo_url);return formsPDF(purchaseFormPages(purchase,items,seller,payments,accessories),'AppleSpace-purchase-'+purchase.purchase_number);}
 export function printReport(title:string,rows:any[]){const keys=rows.length?Object.keys(rows[0]).filter(k=>typeof rows[0][k]!=='object'):[];printHTML(`<h1>AppleSpace</h1><h2>${esc(title)}</h2><small>Generated ${esc(new Date().toLocaleString('en-PK',{timeZone:'Asia/Karachi'}))}</small><table><tr>${keys.map(k=>`<th>${esc(k)}</th>`).join('')}</tr>${rows.map(r=>`<tr>${keys.map(k=>`<td>${esc(r[k])}</td>`).join('')}</tr>`).join('')}</table>`,title);}
-export function whatsappNumber(phone:string){let n=phone.replace(/\D/g,'');if(n.startsWith('0'))n='92'+n.slice(1);if(!/^\d{7,15}$/.test(n))throw Error('Add a valid customer phone number first.');return n;}
-export function whatsapp(phone:string,text:string){const n=whatsappNumber(phone);window.open(`https://wa.me/${n}?text=${encodeURIComponent(text)}`,'_blank','noopener,noreferrer');}
 export async function invoicePDF(sale:any,items:any[],payments:any[],customer:any,phones:any[]){return formsPDF(saleFormPages(sale,items,payments,customer,phones),sale.invoice_number);}
-export function canShareInvoicePDF(file:File){try{return typeof navigator!=='undefined'&&typeof navigator.share==='function'&&navigator.canShare?.({files:[file]})===true}catch{return false}}
-export async function sendInvoiceWhatsApp(file:File,customer:any,downloadAndOpen=false):Promise<'shared'|'downloaded'|'cancelled'>{
- const phone=whatsappNumber(String(customer?.mobile||''));
- if(file.type!=='application/pdf'||!file.size)throw Error('Prepare the invoice PDF before sharing.');
- // The PDF is prepared before this click, preserving the device's share permission.
- if(!downloadAndOpen&&canShareInvoicePDF(file)){
-  try{await navigator.share({files:[file],title:'AppleSpace invoice '+file.name.replace(/\.pdf$/i,'')});return 'shared'}
-  catch(error){if((error as Error)?.name==='AbortError')return 'cancelled';throw error;}
- }
- download(file.name,file,'application/pdf');
- whatsapp(phone,`Dear ${customer?.full_name||'Customer'},\nYour AppleSpace invoice ${file.name.replace(/\.pdf$/i,'')} is ready.\nThank you for choosing AppleSpace.`);
- return 'downloaded';
-}

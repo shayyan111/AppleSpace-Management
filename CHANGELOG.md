@@ -1,3 +1,11 @@
+## Faster startup, searches and large histories — 9 October 2026
+
+- Load feature pages and printing/export code on demand; preload likely navigation on pointer/focus. Keep native PDF sharing and WhatsApp opening inside the original user gesture.
+- Build reusable snapshot indexes for customers, purchases, payments, costs and exact stock codes. Cache histories/ledgers per snapshot, including array-change invalidation and account isolation. Reuse PKR/date formatters and compute report results once.
+- Render inventory, purchases, sales, customers, CRM, ledgers, reports and supplier history in pages of 50 rows. Financial summaries and exports still cover every matching record; CRM selection covers all matching pages.
+- Share duplicate refresh reads, cancel superseded/account-change reads and prevent older responses replacing post-save data. Add page-loading/error states and load font styles without a nested CSS import.
+- Add large-record totals, row limits, stale-cache and refresh-race regression checks, plus a reproducible performance measurement script. See PERFORMANCE.md for measurements and scope.
+
 ## Audible scans and faster camera decoding — 8 October 2026
 
 - Added a short success beep for camera scans and matched USB/keyboard scans, with gesture-based audio unlock and a Test beep button. Sound failures do not block checkout.

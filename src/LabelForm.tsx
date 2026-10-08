@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import {printLabel} from './output';
+import {printLabel} from './outputActions';
 import {labelFormats,defaultLabelSize,type LabelSize} from './labelLayout';
 export default function LabelForm({item,accessory=false,safe}:{item:Record<string,any>;accessory?:boolean;safe:(fn:()=>Promise<void>)=>Promise<unknown>}){
  const [copies,setCopies]=useState('1'),[health,setHealth]=useState(true),[busy,setBusy]=useState(false),[size,setSize]=useState<LabelSize>(defaultLabelSize);

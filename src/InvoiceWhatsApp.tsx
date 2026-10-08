@@ -1,6 +1,6 @@
 import {useEffect,useState} from 'react';
 import {Download,FileText,Send} from 'lucide-react';
-import {invoicePDF,canShareInvoicePDF,sendInvoiceWhatsApp,whatsappNumber,download,whatsapp} from './output';
+import {invoicePDF,canShareInvoicePDF,sendInvoiceWhatsApp,whatsappNumber,download,whatsapp} from './outputActions';
 type Row=Record<string,any>;
 export default function InvoiceWhatsApp({sale,items,payments,customer,phones}:{sale:Row;items:Row[];payments:Row[];customer?:Row;phones:Row[]}){
  const [file,setFile]=useState<File|null>(null),[error,setError]=useState(''),[busy,setBusy]=useState(false),[status,setStatus]=useState(''),[retry,setRetry]=useState(0);

@@ -208,3 +208,7 @@ Successful camera scans play a short beep; matched keyboard/USB scans also beep 
 The scanner requests rear-camera 1080p video and continuous autofocus where supported. It tries native barcode detection when the browser supports it, with targeted Code128/QR and common retail-barcode software fallback. Fast retries alternate centre, full-image and rotated passes. Use **Torch** and **Zoom** if the selected camera exposes them. Start around 15–25 cm from the label, move slowly until the bars look sharp, and keep the whole code and its white edges visible. The preview shows the complete camera image. A QR label is often easier to read than a very narrow printed barcode.
 
 Use good lighting and keep the complete barcode/QR in view. Camera permission is required; HTTPS or localhost is required for browser camera access. On a phone, use the deployed HTTPS address rather than an HTTP LAN development URL. Permission-denied/busy/missing-camera errors offer retry guidance. Real laptop/phone camera accuracy still needs checking on the target devices.
+
+## Performance
+
+Feature pages and printing/export tools load when needed. Large lists show 50 records per page; search and exports still cover all matching records and financial totals cover the full dataset. Navigation preloads likely pages, snapshot indexes speed up history and ledger lookups, and refresh coordination prevents duplicate or stale reads. No persistent business-data cache is used. See [PERFORMANCE.md](PERFORMANCE.md) for measured results and `npm run performance` to reproduce the checks.

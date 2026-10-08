@@ -7,7 +7,7 @@ import {resolve} from 'node:path';
 import React from 'react';
 import {renderToStaticMarkup} from 'react-dom/server';
 
-const built=await build({stdin:{contents:`export {default as SellerPhotoField} from './src/SellerPhotoField.tsx'; export {default as PhotoCapture} from './src/PhotoCapture.tsx'; export {default as StockScanner} from './src/StockScanner.tsx'; export {default as CameraScanner} from './src/CameraScanner.tsx'; export {default as PasswordGate} from './src/PasswordGate.tsx'; export {default as SupplierStatement} from './src/SupplierStatement.tsx'; export {default as AccessoryForm} from './src/AccessoryForm.tsx'; export {default as ExpenseForm} from './src/ExpenseForm.tsx'; export {default as LabelForm} from './src/LabelForm.tsx'; export {default as InvoiceWhatsApp} from './src/InvoiceWhatsApp.tsx'; export {default as LedgerPage} from './src/LedgerPage.tsx'; export {default as Purchases} from './src/Purchases.tsx'; export {default as Customers} from './src/Customers.tsx'; export {default as RecordCleanup} from './src/RecordCleanup.tsx'; export {default as Inventory} from './src/Inventory.tsx'; export {default as SaleForm} from './src/SaleForm.tsx'; export {default as PurchaseForm} from './src/PurchaseForm.tsx'; export {default as CustomerCRM} from './src/CustomerCRM.tsx';`,resolveDir:process.cwd(),loader:'ts'},loader:{'.png':'dataurl','.ttf':'dataurl'},bundle:true,platform:'node',format:'esm',packages:'external',jsx:'automatic',write:false});
+const built=await build({stdin:{contents:`export {default as SalesPage} from './src/SalesPage.tsx'; export {default as SellerPhotoField} from './src/SellerPhotoField.tsx'; export {default as PhotoCapture} from './src/PhotoCapture.tsx'; export {default as StockScanner} from './src/StockScanner.tsx'; export {default as CameraScanner} from './src/CameraScanner.tsx'; export {default as PasswordGate} from './src/PasswordGate.tsx'; export {default as SupplierStatement} from './src/SupplierStatement.tsx'; export {default as AccessoryForm} from './src/AccessoryForm.tsx'; export {default as ExpenseForm} from './src/ExpenseForm.tsx'; export {default as LabelForm} from './src/LabelForm.tsx'; export {default as InvoiceWhatsApp} from './src/InvoiceWhatsApp.tsx'; export {default as LedgerPage} from './src/LedgerPage.tsx'; export {default as Purchases} from './src/Purchases.tsx'; export {default as Customers} from './src/Customers.tsx'; export {default as RecordCleanup} from './src/RecordCleanup.tsx'; export {default as Inventory} from './src/Inventory.tsx'; export {default as SaleForm} from './src/SaleForm.tsx'; export {default as PurchaseForm} from './src/PurchaseForm.tsx'; export {default as CustomerCRM} from './src/CustomerCRM.tsx';`,resolveDir:process.cwd(),loader:'ts'},loader:{'.png':'dataurl','.ttf':'dataurl'},bundle:true,platform:'node',format:'esm',packages:'external',jsx:'automatic',write:false});
 const temp=resolve('node_modules/.cache/workflow-ui-'+process.pid+'.mjs');
 await mkdir(resolve('node_modules/.cache'),{recursive:true});
 await writeFile(temp,built.outputFiles[0].text);
@@ -124,4 +124,19 @@ test('Stock lookup exposes phone camera scanning and a link to open it on the ph
 test('An accessory found by scanning can start checkout with that stocked item already included',()=>{
  const input={...data,accessories:[{id:'cable',name:'USB cable',sku:'CAB',quantity:100,sale_price:500}]};
  const html=renderToStaticMarkup(React.createElement(components.SaleForm,{data:input,initialAccessory:'cable'}));assert.match(html,/Item 1 name/);assert.match(html,/value="USB cable"/);assert.match(html,/&quot;accessory_id&quot;:&quot;cable&quot;/);assert.match(html,/TOTAL BILL/);assert.match(html,/500/);
+});
+
+test('Large inventory, purchase, customer and ledger tables render 50 rows while totals keep all records',()=>{
+ const count=175;
+ const records={...data,inventory:Array.from({length:count},(_,i)=>({id:'p'+i,stock_code:'AS-'+i,model:'iPhone',status:'in_stock',purchase_id:'buy'+i,purchase_price:100,default_sale_price:200})),soldPhones:[],accessories:[],customers:Array.from({length:count},(_,i)=>({id:'c'+i,full_name:'Customer '+i})),sales:Array.from({length:count},(_,i)=>({id:'s'+i,customer_id:'c'+i,final_total:100,sale_date:'2026-10-01',invoice_number:'INV-'+i,payment_status:'unpaid'})),payments:[],saleItems:[],purchases:Array.from({length:count},(_,i)=>({id:'buy'+i,seller_id:'v',purchase_number:i,total_amount:100,purchase_date:'2026-09-01'})),suppliers:[{id:'v',full_name:'Supplier'}],supplierPayments:[],ledgerEntries:[],ledgerPayments:[]};
+ const variants=[
+  ['Inventory',{data:records,manager:true,busy:false,setModal(){},safe:async f=>f(),repair(){}}],
+  ['Purchases',{data:records,search:'',setSearch(){},setModal(){},print(){},exportRows(){}}],
+  ['Customers',{data:records,manager:true,setModal(){},customerDue:s=>s.final_total,safe:async f=>f()}],
+  ['CustomerCRM',{data:records}],
+  ['LedgerPage',{kind:'receivable',data:records,manager:true,save:async()=>{},setModal(){}}],
+  ['SalesPage',{data:records,search:'',setSearch(){},from:'',to:'',setFrom(){},setTo(){},setModal(){},safe:async f=>f(),exportRows(){}}]
+ ];
+ for(const [name,props] of variants){const html=renderToStaticMarkup(React.createElement(components[name],props));assert.equal((html.match(/<tbody>.*?<\/tbody>/s)?.[0].match(/<tr/g)||[]).length,50,name);assert.match(html,/Showing 1–50 of 175/,name);assert.match(html,/Record page/,name);}
+ const ledger=renderToStaticMarkup(React.createElement(components.LedgerPage,variants[4][1]));assert.match(ledger,/17,500/);
 });

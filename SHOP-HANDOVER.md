@@ -64,3 +64,7 @@ Before recording real trading, verify owner/staff permissions, the receipt print
 Arrange a provider backup and an exported copy outside the database, and test restoring on a separate database. ERP JSON exports do not include seller photo files or Auth credentials; those need their own backup plan. Give the owner the login, website address, backup procedure and support contact privately. Keep hosting/database account ownership and billing clear so the shop can continue operating.
 
 Useful future additions are self-service password recovery, staff invitations inside the ERP, owner MFA, session inactivity logout, and monitored backups. These are separate from the supplier statement and login changes in this update.
+
+## Large record lists
+
+Lists show 50 records per page. Use Previous, Next or the page selector to see more. Search covers all saved records, and exports include every matching record across pages. Dashboard/ledger totals use the full dataset. In Customer messages, Select all matching selects matching customers across pages. Pages and printing tools load the first time they are used, then remain available in the current browser session.

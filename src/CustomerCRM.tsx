@@ -1,9 +1,10 @@
-import {useMemo,useState} from 'react';
+import {useDeferredValue,useMemo,useState} from 'react';
+import Pagination,{usePagination} from './Pagination';
 import {Send} from 'lucide-react';
 import {money} from './math.mjs';
 import {customerHistory} from './customerHistory.mjs';
 import {canMessage,campaignMatches,campaignMessage,campaignRecipients} from './campaign.mjs';
-import {whatsapp} from './output';
+import {whatsapp} from './outputActions';
 type Row=Record<string,any>;
 type Message={id:string;name:string;mobile:string;text:string};
 const templates:Record<string,string>={
@@ -16,7 +17,9 @@ export default function CustomerCRM({data}:{data:Row}){
  const [audience,setAudience]=useState('all'),[template,setTemplate]=useState('deal'),[custom,setCustom]=useState(''),[search,setSearch]=useState(''),[draft,setDraft]=useState(templates.deal),[preview,setPreview]=useState('');
  const [selected,setSelected]=useState<Set<string>>(new Set()),[queue,setQueue]=useState<Message[]>([]),[next,setNext]=useState(0),[error,setError]=useState('');
  const contacts=useMemo(()=>data.customers.map((c:Row)=>customerHistory(data,c)),[data]);
- const shown=contacts.filter((c:Row)=>campaignMatches(c,audience,search));
+ const query=useDeferredValue(search);
+ const shown=useMemo(()=>contacts.filter((c:Row)=>campaignMatches(c,audience,query)),[contacts,audience,query]);
+ const {visible,pagination}=usePagination<Row>(shown,audience+query);
  const recipients=campaignRecipients(contacts,selected),selectable=shown.filter(canMessage);
  const allSelected=selectable.length>0&&selectable.every((c:Row)=>selected.has(c.id));
  const message=(c:Row)=>campaignMessage(draft,custom,c);
@@ -36,5 +39,5 @@ export default function CustomerCRM({data}:{data:Row}){
  {queue.length>0&&<section className="campaign-queue" aria-label="Selected customer messages"><h3>Selected recipients</h3><p>{next} of {queue.length} drafts opened for review</p><ol>{queue.map((m,i)=><li key={m.id}>{m.name} · {m.mobile}<small>{i<next?'Draft opened':i===next?'Next customer':'Waiting'}</small></li>)}</ol>{next<queue.length?<><div className="message-preview"><b>Next: {queue[next].name}</b><p>{queue[next].text}</p></div><button className="primary" onClick={()=>{if(open(queue[next].mobile,queue[next].text))setNext(i=>i+1)}}><Send size={15}/>Review next in WhatsApp</button></>:<p>All selected drafts have been opened. Check WhatsApp for the messages you sent.</p>}</section>}
  {error&&<div className="error" role="alert">{error}</div>}</section>
  <section className="panel"><div className="panel-head"><div><h3>Customer list</h3><small>{shown.length} matching contacts · {recipients.length} selected</small></div></div><div className="toolbar"><input aria-label="Search message recipients" placeholder="Search customer, phone or purchased model" value={search} onChange={e=>setSearch(e.target.value)}/><button disabled={!selectable.length} onClick={toggleMatching}>{allSelected?'Deselect matching':'Select all matching'}</button></div>
- <div className="table-scroll"><table><thead><tr><th><input type="checkbox" aria-label="Select all matching customers" disabled={!selectable.length} checked={allSelected} onChange={toggleMatching}/></th><th>Name</th><th>Phone</th><th>Purchase history</th><th>Last purchase</th><th>Balance</th><th>Message</th></tr></thead><tbody>{shown.map((c:Row)=><tr key={c.id}><td><input type="checkbox" aria-label={'Select '+c.full_name} checked={selected.has(c.id)} disabled={!canMessage(c)} onChange={()=>toggle(c.id)}/></td><td><b>{c.full_name}</b><small>{c.customer_kind||'customer'}</small></td><td>{c.mobile||'—'}</td><td>{c.phones.length?c.phones.map((p:Row)=><div key={p.id}>{p.name}<small>{p.phone?.imei_1||''}</small></div>):'No recorded phone purchases'}</td><td>{c.last?new Date(c.last.sale_date).toLocaleDateString('en-PK',{timeZone:'Asia/Karachi'}):'—'}</td><td>{money(c.balance)}</td><td><div className="row-actions"><button onClick={()=>setPreview(c.id)}>Preview</button><button disabled={!canMessage(c)||!draft.trim()} onClick={()=>open(c.mobile,message(c))}><Send size={15}/>WhatsApp</button></div></td></tr>)}</tbody></table></div>{!shown.length&&<div className="empty">No customers match this audience.</div>}</section></div>;
+ <div className="table-scroll"><table><thead><tr><th><input type="checkbox" aria-label="Select all matching customers" disabled={!selectable.length} checked={allSelected} onChange={toggleMatching}/></th><th>Name</th><th>Phone</th><th>Purchase history</th><th>Last purchase</th><th>Balance</th><th>Message</th></tr></thead><tbody>{visible.map((c:Row)=><tr key={c.id}><td><input type="checkbox" aria-label={'Select '+c.full_name} checked={selected.has(c.id)} disabled={!canMessage(c)} onChange={()=>toggle(c.id)}/></td><td><b>{c.full_name}</b><small>{c.customer_kind||'customer'}</small></td><td>{c.mobile||'—'}</td><td>{c.phones.length?c.phones.map((p:Row)=><div key={p.id}>{p.name}<small>{p.phone?.imei_1||''}</small></div>):'No recorded phone purchases'}</td><td>{c.last?new Date(c.last.sale_date).toLocaleDateString('en-PK',{timeZone:'Asia/Karachi'}):'—'}</td><td>{money(c.balance)}</td><td><div className="row-actions"><button onClick={()=>setPreview(c.id)}>Preview</button><button disabled={!canMessage(c)||!draft.trim()} onClick={()=>open(c.mobile,message(c))}><Send size={15}/>WhatsApp</button></div></td></tr>)}</tbody></table></div><Pagination {...pagination}/>{!shown.length&&<div className="empty">No customers match this audience.</div>}</section></div>;
 }

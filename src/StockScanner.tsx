@@ -3,7 +3,7 @@ import {Camera,Copy,Package,Printer,Search,ShoppingBag,Smartphone} from 'lucide-
 import QRCode from 'qrcode';
 import CameraScanner from './CameraScanner';
 import {stockMatches,phoneScannerURL} from './stockScan.mjs';
-import {printLabel} from './output';
+import {printLabel} from './outputActions';
 import {prepareScanFeedback,scanBeep} from './scanFeedback.mjs';
 type Row=Record<string,any>;
 export default function StockScanner({data,setModal,safe,address=typeof window==='undefined'?'':window.location.href}:{data:Row;setModal:(value:Row)=>void;safe:(fn:()=>Promise<any>)=>Promise<any>;address?:string}){

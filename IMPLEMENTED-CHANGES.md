@@ -17,6 +17,7 @@
 | Customer requirements | Required name and 11-digit phone, checked in the UI and database. |
 | Billing staff | Enter a billing name, defaulting to the signed-in staff name; preserve it on invoices while the account remains the audit actor. |
 | Bill summary | Itemized phone/accessory quantities, amounts, discount and total displayed before payment details. |
+| Performance | On-demand pages/document tools, indexed snapshot history and stock lookups, shared formatters, 50-row table pages, full-result exports, memoized reports and cancellable/coalesced reads. |
 | Scanning | Phone-camera barcode/QR lookup in Labels & scanner and checkout, camera selection/retry, scan-success beep, native detection with targeted software fallback, supported focus/torch/zoom controls, laptop-to-phone scanner link QR, and USB keyboard scanners. Camera streams close on cancellation, success or failure. |
 | Customer details | Dedicated details view with contact fields, invoice/item/IMEI history, spending, outstanding balance and payments. |
 | Customer CRM | Greetings, offers, updates and follow-up templates; editable drafts, audience filters, individual preview and personalized WhatsApp drafts. |
