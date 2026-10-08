@@ -1,3 +1,10 @@
+## Audible scans and faster camera decoding — 8 October 2026
+
+- Added a short success beep for camera scans and matched USB/keyboard scans, with gesture-based audio unlock and a Test beep button. Sound failures do not block checkout.
+- Replaced the general-purpose 500 ms scan loop with non-overlapping 100 ms retries, native barcode detection where available and a targeted software fallback. Fast passes alternate full-resolution centre, full-frame and rotated images; periodic deeper passes handle harder labels without slowing every frame.
+- Requested sharper rear-camera video and continuous focus where supported. Added capability-based torch/zoom controls and an uncropped preview. No microphone access is requested.
+- Added lifecycle, native fallback, audio, real-code decoding under reduced contrast, rotation and camera-control regression checks. Target-phone performance still needs hardware verification.
+
 ## Seller webcam photos and phone stock scanning — 8 October 2026
 
 - Added live seller photo capture with built-in/USB camera selection, preview, retake/remove, file upload and original photo-required rules. Camera JPEGs attach to the normal purchase upload and are saved only with the purchase.

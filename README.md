@@ -203,4 +203,8 @@ Open the deployed HTTPS ERP address on your phone and sign in. In **Labels & sca
 
 From a laptop, click **Labels & scanner → Open scanner on phone** to display a link QR. Scan that link using the phone's regular camera, open the ERP, and sign in; the `#scan` link opens the stock scanner after login. Stock scanning and checkout run in the phone's ERP session. This link does not pair the phone camera with an open laptop checkout.
 
+Successful camera scans play a short beep; matched keyboard/USB scans also beep when submitted with Enter (or Add scanned item). Tap **Test beep** inside the camera scanner to check sound and enable it if the browser blocked it. Keep media volume on.
+
+The scanner requests rear-camera 1080p video and continuous autofocus where supported. It tries native barcode detection when the browser supports it, with targeted Code128/QR and common retail-barcode software fallback. Fast retries alternate centre, full-image and rotated passes. Use **Torch** and **Zoom** if the selected camera exposes them. Start around 15–25 cm from the label, move slowly until the bars look sharp, and keep the whole code and its white edges visible. The preview shows the complete camera image. A QR label is often easier to read than a very narrow printed barcode.
+
 Use good lighting and keep the complete barcode/QR in view. Camera permission is required; HTTPS or localhost is required for browser camera access. On a phone, use the deployed HTTPS address rather than an HTTP LAN development URL. Permission-denied/busy/missing-camera errors offer retry guidance. Real laptop/phone camera accuracy still needs checking on the target devices.

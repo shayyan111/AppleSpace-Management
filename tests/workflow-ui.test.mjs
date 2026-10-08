@@ -119,7 +119,7 @@ test('Seller photo field offers camera capture and preserves mandatory walk-in p
 });
 test('Stock lookup exposes phone camera scanning and a link to open it on the phone',()=>{
  const html=renderToStaticMarkup(React.createElement(components.StockScanner,{data,setModal(){},safe:async fn=>fn(),address:'https://erp.example.com/'}));assert.match(html,/Scan barcode \/ QR with camera/);assert.match(html,/Open scanner on phone/);assert.match(html,/allow camera access/);assert.match(html,/Use phone camera/);
- const camera=renderToStaticMarkup(React.createElement(components.CameraScanner,{onCode(){},onClose(){}}));assert.match(camera,/Barcode camera/);assert.match(camera,/rear camera on phone/);assert.match(camera,/Retry camera/);
+ const camera=renderToStaticMarkup(React.createElement(components.CameraScanner,{onCode(){},onClose(){}}));assert.match(camera,/Barcode camera/);assert.match(camera,/rear camera on phone/);assert.match(camera,/Retry camera/);assert.match(camera,/Test beep/);assert.doesNotMatch(camera,/Camera zoom|Torch on/);
 });
 test('An accessory found by scanning can start checkout with that stocked item already included',()=>{
  const input={...data,accessories:[{id:'cable',name:'USB cable',sku:'CAB',quantity:100,sale_price:500}]};

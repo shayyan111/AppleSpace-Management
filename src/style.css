@@ -55,3 +55,5 @@ button:focus-visible{outline:2px solid #686e79;outline-offset:3px}
 .phone-scanner-link a{display:block;overflow-wrap:anywhere;font-size:12px;margin-bottom:12px}
 .scanner .camera-scanner{max-width:720px;margin:0 auto 24px}
 @media(max-width:600px){.scanner{padding:20px 14px}.camera-device{display:block}.camera-device select{display:block;width:100%;margin-top:8px}.phone-scanner-link{flex-direction:column;align-items:center}.phone-scanner-link>div{width:100%}.scan-card{align-items:flex-start;flex-wrap:wrap}.scan-card .actions{margin-left:0;width:100%}.scan-box{gap:8px;padding:10px}.scan-box input{min-width:0;width:100%}.camera-scanner .scan-guide{position:static;padding:14px}.camera-scanner video{max-height:320px}}
+
+.camera-scanner video{object-fit:contain}.camera-scanner video[hidden]{display:none}.camera-actions{display:flex;gap:8px;flex-wrap:wrap}.scan-zoom{display:flex;align-items:center;gap:14px;font-size:12px;margin-top:14px}.scan-zoom input{flex:1;min-width:70px;padding:0}.scan-control-error{color:#f2c1c1;font-size:12px;margin:12px 0 0}

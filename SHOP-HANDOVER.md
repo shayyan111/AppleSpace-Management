@@ -41,7 +41,7 @@ Source: [Chrome web app installation and shortcuts](https://support.google.com/c
 
 On the laptop, go to **Purchases → Add purchase → Take seller photo**, allow camera access, select the built-in/USB camera and capture the seller. Retake or upload a saved photo if needed. Save the purchase to upload the selected photo.
 
-On the phone, open the same deployed HTTPS address, sign in, and go to **Labels & scanner → Scan barcode / QR with camera**. Alternatively, the laptop's **Open scanner on phone** button displays a QR link that opens this page after phone login. Use **Create sale** for a scanned product, or **Sales & invoices → New sale → Use phone camera** to add stock to a bill. Each accessory uses its shared SKU. The phone runs its own checkout; the link does not send scans into an open laptop bill.
+On the phone, open the same deployed HTTPS address, sign in, and go to **Labels & scanner → Scan barcode / QR with camera**. Alternatively, the laptop's **Open scanner on phone** button displays a QR link that opens this page after phone login. Use **Create sale** for a scanned product, or **Sales & invoices → New sale → Use phone camera** to add stock to a bill. Each accessory uses its shared SKU. A successful scan beeps once. Use **Test beep** to check sound, and turn up device media volume. Keep the complete label sharp in the preview; use the available torch/zoom controls for small labels. The phone runs its own checkout; the link does not send scans into an open laptop bill.
 
 ## 4. Understand the supplier statement
 

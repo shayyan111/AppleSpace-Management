@@ -1,1 +1,2 @@
-export function startCamera(video: HTMLVideoElement, onCode: (code: string) => void, onError: (message: string) => void, options?:{deviceId?:string;onCameras?:(cameras:Array<{id:string;label:string}>)=>void}): { stop: () => void; ready: Promise<void> };
+export type ScannerControls={torch:boolean;zoom:{min:number;max:number;step:number;value:number}|null};
+export function startCamera(video:HTMLVideoElement,onCode:(code:string)=>void,onError:(message:string)=>void,options?:{deviceId?:string;onCameras?:(cameras:Array<{id:string;label:string}>)=>void;onReady?:(controls:ScannerControls)=>void}):{stop:()=>void;ready:Promise<void>;setControl:(name:'torch'|'zoom',value:boolean|number)=>Promise<void>};
