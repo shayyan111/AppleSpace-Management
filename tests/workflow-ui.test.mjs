@@ -7,7 +7,7 @@ import {resolve} from 'node:path';
 import React from 'react';
 import {renderToStaticMarkup} from 'react-dom/server';
 
-const built=await build({stdin:{contents:`export {default as AccessoryForm} from './src/AccessoryForm.tsx'; export {default as ExpenseForm} from './src/ExpenseForm.tsx'; export {default as LabelForm} from './src/LabelForm.tsx'; export {default as LedgerPage} from './src/LedgerPage.tsx'; export {default as Purchases} from './src/Purchases.tsx'; export {default as Customers} from './src/Customers.tsx'; export {default as RecordCleanup} from './src/RecordCleanup.tsx'; export {default as Inventory} from './src/Inventory.tsx'; export {default as SaleForm} from './src/SaleForm.tsx'; export {default as PurchaseForm} from './src/PurchaseForm.tsx'; export {default as CustomerCRM} from './src/CustomerCRM.tsx';`,resolveDir:process.cwd(),loader:'ts'},loader:{'.png':'dataurl','.ttf':'dataurl'},bundle:true,platform:'node',format:'esm',packages:'external',jsx:'automatic',write:false});
+const built=await build({stdin:{contents:`export {default as AccessoryForm} from './src/AccessoryForm.tsx'; export {default as ExpenseForm} from './src/ExpenseForm.tsx'; export {default as LabelForm} from './src/LabelForm.tsx'; export {default as InvoiceWhatsApp} from './src/InvoiceWhatsApp.tsx'; export {default as LedgerPage} from './src/LedgerPage.tsx'; export {default as Purchases} from './src/Purchases.tsx'; export {default as Customers} from './src/Customers.tsx'; export {default as RecordCleanup} from './src/RecordCleanup.tsx'; export {default as Inventory} from './src/Inventory.tsx'; export {default as SaleForm} from './src/SaleForm.tsx'; export {default as PurchaseForm} from './src/PurchaseForm.tsx'; export {default as CustomerCRM} from './src/CustomerCRM.tsx';`,resolveDir:process.cwd(),loader:'ts'},loader:{'.png':'dataurl','.ttf':'dataurl'},bundle:true,platform:'node',format:'esm',packages:'external',jsx:'automatic',write:false});
 const temp=resolve('node_modules/.cache/workflow-ui-'+process.pid+'.mjs');
 await mkdir(resolve('node_modules/.cache'),{recursive:true});
 await writeFile(temp,built.outputFiles[0].text);
@@ -91,4 +91,10 @@ test('Accessory quantity additions request neither cost nor supplier; new purcha
 test('Receivables offer balance reminders only for outstanding balances',()=>{
  const input={...data,ledgerEntries:[{id:'r',kind:'receivable',category:'existing_balance',full_name:'Debtor',mobile:'03000000001',description:'',record_date:'2026-10-01',amount:100}],ledgerPayments:[]};const props={kind:'receivable',data:input,manager:true,save:async()=>{},setModal(){}};assert.match(renderToStaticMarkup(React.createElement(components.LedgerPage,props)),/Remind on WhatsApp/);
  assert.doesNotMatch(renderToStaticMarkup(React.createElement(components.LedgerPage,{...props,data:{...input,ledgerPayments:[{entry_id:'r',amount:100}]}})),/Remind on WhatsApp/);
+});
+
+
+test('WhatsApp PDF dialog names the customer and prepares the file before enabling sending',()=>{
+ const html=renderToStaticMarkup(React.createElement(components.InvoiceWhatsApp,{sale:{id:'s',invoice_number:'AS-123'},items:[],payments:[],customer:{full_name:'Invoice customer',mobile:'03000000001'},phones:[]}));
+ assert.match(html,/AS-123.pdf/);assert.match(html,/Invoice customer/);assert.match(html,/03000000001/);assert.match(html,/Preparing invoice PDF/);assert.doesNotMatch(html,/Send PDF via WhatsApp|Download PDF &amp; open WhatsApp/);
 });
