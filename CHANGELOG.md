@@ -1,3 +1,10 @@
+## Seller webcam photos and phone stock scanning — 8 October 2026
+
+- Added live seller photo capture with built-in/USB camera selection, preview, retake/remove, file upload and original photo-required rules. Camera JPEGs attach to the normal purchase upload and are saved only with the purchase.
+- Added camera barcode/QR scanning to Labels & scanner, product results and Create sale actions for phones/accessories. Added a phone scanner link QR and scanner deep link that opens after login.
+- Improved checkout camera selection/retry and repeated accessory scans, retaining the shared SKU and preventing scanned quantities above stock.
+- Added camera permission/cancellation/resource-release, captured-file, stock-code matching, actual Code128/QR decoding and rendered workflow checks. Updated shop instructions.
+
 ## Chronological supplier statements and fresh-session login — 8 October 2026
 
 - Supplier statements now interleave purchases and payments by date/time, with saved product details, IMEI, payment method and a running balance. Same-time paid-now payments follow purchases; legacy missing costs are flagged. Print/PDF and Excel include the ledger.

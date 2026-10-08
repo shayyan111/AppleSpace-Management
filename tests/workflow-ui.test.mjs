@@ -7,7 +7,7 @@ import {resolve} from 'node:path';
 import React from 'react';
 import {renderToStaticMarkup} from 'react-dom/server';
 
-const built=await build({stdin:{contents:`export {default as PasswordGate} from './src/PasswordGate.tsx'; export {default as SupplierStatement} from './src/SupplierStatement.tsx'; export {default as AccessoryForm} from './src/AccessoryForm.tsx'; export {default as ExpenseForm} from './src/ExpenseForm.tsx'; export {default as LabelForm} from './src/LabelForm.tsx'; export {default as InvoiceWhatsApp} from './src/InvoiceWhatsApp.tsx'; export {default as LedgerPage} from './src/LedgerPage.tsx'; export {default as Purchases} from './src/Purchases.tsx'; export {default as Customers} from './src/Customers.tsx'; export {default as RecordCleanup} from './src/RecordCleanup.tsx'; export {default as Inventory} from './src/Inventory.tsx'; export {default as SaleForm} from './src/SaleForm.tsx'; export {default as PurchaseForm} from './src/PurchaseForm.tsx'; export {default as CustomerCRM} from './src/CustomerCRM.tsx';`,resolveDir:process.cwd(),loader:'ts'},loader:{'.png':'dataurl','.ttf':'dataurl'},bundle:true,platform:'node',format:'esm',packages:'external',jsx:'automatic',write:false});
+const built=await build({stdin:{contents:`export {default as SellerPhotoField} from './src/SellerPhotoField.tsx'; export {default as PhotoCapture} from './src/PhotoCapture.tsx'; export {default as StockScanner} from './src/StockScanner.tsx'; export {default as CameraScanner} from './src/CameraScanner.tsx'; export {default as PasswordGate} from './src/PasswordGate.tsx'; export {default as SupplierStatement} from './src/SupplierStatement.tsx'; export {default as AccessoryForm} from './src/AccessoryForm.tsx'; export {default as ExpenseForm} from './src/ExpenseForm.tsx'; export {default as LabelForm} from './src/LabelForm.tsx'; export {default as InvoiceWhatsApp} from './src/InvoiceWhatsApp.tsx'; export {default as LedgerPage} from './src/LedgerPage.tsx'; export {default as Purchases} from './src/Purchases.tsx'; export {default as Customers} from './src/Customers.tsx'; export {default as RecordCleanup} from './src/RecordCleanup.tsx'; export {default as Inventory} from './src/Inventory.tsx'; export {default as SaleForm} from './src/SaleForm.tsx'; export {default as PurchaseForm} from './src/PurchaseForm.tsx'; export {default as CustomerCRM} from './src/CustomerCRM.tsx';`,resolveDir:process.cwd(),loader:'ts'},loader:{'.png':'dataurl','.ttf':'dataurl'},bundle:true,platform:'node',format:'esm',packages:'external',jsx:'automatic',write:false});
 const temp=resolve('node_modules/.cache/workflow-ui-'+process.pid+'.mjs');
 await mkdir(resolve('node_modules/.cache'),{recursive:true});
 await writeFile(temp,built.outputFiles[0].text);
@@ -110,4 +110,18 @@ test('Supplier statement displays product/IMEI, separate payments and the final 
  const records={purchases:[{id:'p',seller_id:'v',purchase_number:1,purchase_date:'2026-10-01T09:00:00Z',total_amount:100000,item_details:[{model:'iPhone 15',imei_1:'111111111111111'}]}],supplierPayments:[{id:'pay',purchase_id:'p',amount:50000,method:'cash',payment_date:'2026-10-02T09:00:00Z'}]};
  const html=renderToStaticMarkup(React.createElement(components.SupplierStatement,{supplier:{id:'v',full_name:'Supplier'},data:records,setModal(){}}));
  assert.match(html,/iPhone 15/);assert.match(html,/IMEI: 111111111111111/);assert.match(html,/Payment to supplier/);assert.match(html,/Bought/);assert.match(html,/Balance owed/);assert.match(html,/50,000/);assert.match(html,/Pay a specific purchase/);
+});
+
+test('Seller photo field offers camera capture and preserves mandatory walk-in photo validation',()=>{
+ const optional=renderToStaticMarkup(React.createElement(components.SellerPhotoField));assert.match(optional,/Take seller photo/);assert.match(optional,/connected USB camera/);assert.doesNotMatch(optional.match(/<input[^>]*name="photo"[^>]*>/)?.[0]||'',/required/);
+ const required=renderToStaticMarkup(React.createElement(components.SellerPhotoField,{required:true}));assert.match(required.match(/<input[^>]*name="photo"[^>]*>/)?.[0]||'',/required/);
+ const capture=renderToStaticMarkup(React.createElement(components.PhotoCapture,{onCapture(){},onClose(){}}));assert.match(capture,/Seller camera/);assert.match(capture,/Capture photo/);assert.match(capture,/playsInline/);assert.match(capture,/Close seller camera/);
+});
+test('Stock lookup exposes phone camera scanning and a link to open it on the phone',()=>{
+ const html=renderToStaticMarkup(React.createElement(components.StockScanner,{data,setModal(){},safe:async fn=>fn(),address:'https://erp.example.com/'}));assert.match(html,/Scan barcode \/ QR with camera/);assert.match(html,/Open scanner on phone/);assert.match(html,/allow camera access/);assert.match(html,/Use phone camera/);
+ const camera=renderToStaticMarkup(React.createElement(components.CameraScanner,{onCode(){},onClose(){}}));assert.match(camera,/Barcode camera/);assert.match(camera,/rear camera on phone/);assert.match(camera,/Retry camera/);
+});
+test('An accessory found by scanning can start checkout with that stocked item already included',()=>{
+ const input={...data,accessories:[{id:'cable',name:'USB cable',sku:'CAB',quantity:100,sale_price:500}]};
+ const html=renderToStaticMarkup(React.createElement(components.SaleForm,{data:input,initialAccessory:'cable'}));assert.match(html,/Item 1 name/);assert.match(html,/value="USB cable"/);assert.match(html,/&quot;accessory_id&quot;:&quot;cable&quot;/);assert.match(html,/TOTAL BILL/);assert.match(html,/500/);
 });

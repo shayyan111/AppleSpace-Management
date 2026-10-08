@@ -194,3 +194,13 @@ Validation: `npm test`, `npm run build`, and rollback-only scenarios in `databas
 The forms embed the licensed DejaVu Sans font in PDFs and browser print output for consistent typography. Font files and their redistribution license are in `src/fonts`.
 
 Both forms include the saved ASPACE logo and Apple Space name at the top, with Sharoz Abbasi and Saad Ali Awan and their business numbers at the top right. The invoice has no seller-signature field; purchase signature fields remain. The same original transparent logo is used at reduced opacity behind the details.
+
+## Seller photos and phone-camera scanning
+
+In **Purchases → Add purchase → Seller details**, click **Take seller photo**, allow camera access, select the built-in or connected USB camera, and click **Capture photo**. Preview the attached photo, retake it if necessary, then save the purchase. Choosing a saved JPEG/PNG/WebP photo is also supported. Registered supplier photos remain optional; walk-in seller photos remain required. Capturing a photo does not upload it until the purchase is saved, and closing/switching the camera stops its video tracks.
+
+Open the deployed HTTPS ERP address on your phone and sign in. In **Labels & scanner**, tap **Scan barcode / QR with camera**, allow access, and point the rear camera at the stock label. Select a different camera if needed. The scanned IMEI/stock code/SKU finds the product, and **Create sale** starts checkout with that phone or accessory. In **Sales & invoices → New sale**, **Use phone camera** adds scanned items directly to the bill. Code128 and QR labels are supported; accessory scans identify the shared product SKU and add one unit at a time, preserving its stock cost for invoice profit.
+
+From a laptop, click **Labels & scanner → Open scanner on phone** to display a link QR. Scan that link using the phone's regular camera, open the ERP, and sign in; the `#scan` link opens the stock scanner after login. Stock scanning and checkout run in the phone's ERP session. This link does not pair the phone camera with an open laptop checkout.
+
+Use good lighting and keep the complete barcode/QR in view. Camera permission is required; HTTPS or localhost is required for browser camera access. On a phone, use the deployed HTTPS address rather than an HTTP LAN development URL. Permission-denied/busy/missing-camera errors offer retry guidance. Real laptop/phone camera accuracy still needs checking on the target devices.

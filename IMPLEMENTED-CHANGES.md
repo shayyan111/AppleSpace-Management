@@ -8,7 +8,7 @@
 | Shop handover | Production deployment configuration and SHOP-HANDOVER.md with laptop installation and account setup instructions. |
 | Inventory price | Separate purchase and sale prices for phones and accessories; purchase costs visible to owners/managers. |
 | Walk-in sellers | Separate purchase-history contacts, excluded from registered supplier directories. |
-| Supplier photos | Optional for registered iPhone suppliers; required for walk-in sellers. |
+| Supplier photos | Built-in/USB webcam capture with preview and retake, plus file upload; optional for registered suppliers and required for walk-in sellers. |
 | Supplier directories | Separate iPhone and accessory supplier lists. |
 | Accessory quantities | Add quantity to an existing SKU using its saved supplier and purchase cost, without asking for either again. |
 | Sold Phones | Dedicated archive and history tab; sold phones are excluded from active inventory and public website stock. |
@@ -17,7 +17,7 @@
 | Customer requirements | Required name and 11-digit phone, checked in the UI and database. |
 | Billing staff | Enter a billing name, defaulting to the signed-in staff name; preserve it on invoices while the account remains the audit actor. |
 | Bill summary | Itemized phone/accessory quantities, amounts, discount and total displayed before payment details. |
-| Scanning | USB/Bluetooth keyboard scanners and phone-camera barcode/QR decoding. Camera streams close on cancellation, success or failure. |
+| Scanning | Phone-camera barcode/QR lookup in Labels & scanner and checkout, camera selection/retry, laptop-to-phone scanner link QR, and USB keyboard scanners. Camera streams close on cancellation, success or failure. |
 | Customer details | Dedicated details view with contact fields, invoice/item/IMEI history, spending, outstanding balance and payments. |
 | Customer CRM | Greetings, offers, updates and follow-up templates; editable drafts, audience filters, individual preview and personalized WhatsApp drafts. |
 | Legacy balances | Historical customer/shopkeeper receivables remain separate from sales revenue, with partial/full payment support and CRM balances. |
@@ -27,7 +27,7 @@
 ## Validation
 
 - Production TypeScript/Vite build.
-- 62 frontend tests covering finance, histories, labels, invoices/PDF sharing, supplier running balances, session persistence, password verification and rendered workflow forms.
+- 75 frontend tests covering finance, histories, labels, invoices/PDF sharing, supplier running balances, session persistence, password verification and rendered workflow forms.
 - Four optional API tests.
 - Rollback database verification: purchase retry, optional cost, seller separation, active cross-IMEI duplicate rejection, missing customer phone rejection, shopkeeper sale, billing staff snapshot, sold archive price, website removal, two sell/buyback lifecycles, immutable original purchase/profit, accessory restocking/sales, legacy payments, balanced journals and role restrictions.
 - Anonymous archive access revoked; guarded private read function exposed through an invoker wrapper.

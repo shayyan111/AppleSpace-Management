@@ -1,3 +1,4 @@
+import {availableCameras,cameraError,videoConstraints} from './photoCamera.mjs';
 export function startCamera(video, onCode, onError, dependencies = {}) {
   let stopped = false;
   let stream;
@@ -14,8 +15,13 @@ export function startCamera(video, onCode, onError, dependencies = {}) {
     try {
       const media = dependencies.mediaDevices ?? globalThis.navigator?.mediaDevices;
       if (!media?.getUserMedia) throw Error('Open the app through HTTPS or localhost and allow camera access.');
-      stream = await media.getUserMedia({ video: { facingMode: { ideal: 'environment' } }, audio: false });
+      stream = await media.getUserMedia(videoConstraints(dependencies.deviceId, 'environment'));
       if (stopped) { stop(); return; }
+      if(dependencies.onCameras){
+        let cameras=[];try{cameras=await availableCameras(media);}catch{/* Default camera can still scan. */}
+        if(stopped){stop();return;}
+        dependencies.onCameras(cameras);
+      }
       const load = dependencies.loadDecoder ?? (async () => {
         const { BrowserMultiFormatReader } = await import('@zxing/browser');
         return new BrowserMultiFormatReader();
@@ -33,7 +39,7 @@ export function startCamera(video, onCode, onError, dependencies = {}) {
     } catch (error) {
       const notify = !stopped;
       stop();
-      if (notify) onError(error instanceof Error ? error.message : 'Could not start the camera.');
+      if (notify) onError(cameraError(error));
     }
   })();
   return { stop, ready };

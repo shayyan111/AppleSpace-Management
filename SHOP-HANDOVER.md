@@ -37,6 +37,12 @@ Source: [Vite on Vercel](https://vercel.com/docs/frameworks/frontend/vite).
 
 Source: [Chrome web app installation and shortcuts](https://support.google.com/chrome/answer/9658361?hl=en).
 
+## Camera photos and scanning
+
+On the laptop, go to **Purchases → Add purchase → Take seller photo**, allow camera access, select the built-in/USB camera and capture the seller. Retake or upload a saved photo if needed. Save the purchase to upload the selected photo.
+
+On the phone, open the same deployed HTTPS address, sign in, and go to **Labels & scanner → Scan barcode / QR with camera**. Alternatively, the laptop's **Open scanner on phone** button displays a QR link that opens this page after phone login. Use **Create sale** for a scanned product, or **Sales & invoices → New sale → Use phone camera** to add stock to a bill. Each accessory uses its shared SKU. The phone runs its own checkout; the link does not send scans into an open laptop bill.
+
 ## 4. Understand the supplier statement
 
 Open **Suppliers → Statement** beside an iPhone or accessory supplier. The statement is oldest first and includes date/time in Pakistan time, purchase reference, model/accessory, saved IMEI, purchase amount, payment method, payment amount, and balance owed after that entry.

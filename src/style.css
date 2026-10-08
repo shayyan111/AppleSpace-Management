@@ -37,3 +37,21 @@ button:focus-visible{outline:2px solid #686e79;outline-offset:3px}
 .owner-gate>small{display:block;color:var(--muted,#6b7280);line-height:1.6}
 .owner-unlock{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px}
 .owner-unlock span{display:flex;align-items:center;gap:8px;color:var(--muted,#6b7280);font-size:13px}
+
+/* Seller camera capture and mobile barcode lookup */
+.seller-photo-field{grid-column:1/-1;min-width:0}
+.seller-photo-field .scanner-buttons{margin:12px 0}
+.seller-photo-preview{display:block;max-width:240px;width:100%;max-height:200px;object-fit:contain;border-radius:8px;margin:12px 0;background:#282a2f}
+.camera-device{display:flex;align-items:center;gap:12px;padding:12px;color:#e8e9ec;font-size:12px}
+.camera-device select{flex:1;min-width:0;max-width:100%}
+.camera-actions{display:flex;gap:10px;flex-wrap:wrap;padding:14px}
+.camera-tip{color:#d9d9df;font-size:12px;line-height:1.6;padding:0 14px}
+.photo-camera video{max-height:340px;width:100%;object-fit:contain;background:#191b20}
+.stock-scanner-buttons{justify-content:center;margin:0 auto 22px;flex-wrap:wrap}
+.stock-scanner-buttons button{white-space:normal}
+.phone-scanner-link{display:flex;align-items:center;gap:22px;background:#d7d9dd;border-radius:10px;padding:18px;max-width:720px;margin:0 auto 25px}
+.phone-scanner-link img{width:180px;height:180px;flex-shrink:0;border-radius:8px}
+.phone-scanner-link p{font-size:12px;line-height:1.7;margin:8px 0}
+.phone-scanner-link a{display:block;overflow-wrap:anywhere;font-size:12px;margin-bottom:12px}
+.scanner .camera-scanner{max-width:720px;margin:0 auto 24px}
+@media(max-width:600px){.scanner{padding:20px 14px}.camera-device{display:block}.camera-device select{display:block;width:100%;margin-top:8px}.phone-scanner-link{flex-direction:column;align-items:center}.phone-scanner-link>div{width:100%}.scan-card{align-items:flex-start;flex-wrap:wrap}.scan-card .actions{margin-left:0;width:100%}.scan-box{gap:8px;padding:10px}.scan-box input{min-width:0;width:100%}.camera-scanner .scan-guide{position:static;padding:14px}.camera-scanner video{max-height:320px}}

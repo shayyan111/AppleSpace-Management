@@ -27,3 +27,11 @@ test('Decoder failure releases an opened stream and reports an error',async()=>{
     loadDecoder:async()=>{throw Error('Decoder unavailable')}
   });await scanner.ready;assert.equal(stopped,1);assert.deepEqual(errors,['Decoder unavailable']);
 });
+
+test('Phone scanner prefers the rear camera and can select a specific camera',async()=>{
+ const requests=[],devices=[];
+ const dependencies={mediaDevices:{getUserMedia:async request=>{requests.push(request);return {getTracks:()=>[{stop(){}}]};},enumerateDevices:async()=>[{kind:'videoinput',deviceId:'rear',label:'Rear camera'}]},loadDecoder:async()=>({decodeFromStream:async()=>({stop(){}})})};
+ const first=startCamera({},()=>{},()=>assert.fail('No camera error'),{...dependencies,onCameras:list=>devices.push(list)});await first.ready;first.stop();
+ const second=startCamera({},()=>{},()=>assert.fail('No camera error'),{...dependencies,deviceId:'rear'});await second.ready;second.stop();
+ assert.deepEqual(requests[0].video.facingMode,{ideal:'environment'});assert.equal(requests[0].audio,false);assert.deepEqual(requests[1].video.deviceId,{exact:'rear'});assert.deepEqual(devices,[[{id:'rear',label:'Rear camera'}]]);
+});
