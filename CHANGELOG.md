@@ -1,3 +1,11 @@
+## Chronological supplier statements and fresh-session login — 8 October 2026
+
+- Supplier statements now interleave purchases and payments by date/time, with saved product details, IMEI, payment method and a running balance. Same-time paid-now payments follow purchases; legacy missing costs are flagged. Print/PDF and Excel include the ledger.
+- Removed persistent browser login. New openings and reloads require account ID (email) and password; account changes clear displayed records and conversations.
+- Added owner password verification for Settings, Reports, Daily Closing and Record Cleanup, with page-leave, app-hide and ten-minute relocking. Settings is now owner-only.
+- Added Vercel deployment configuration and a shop handover guide. Production hosting still needs to be configured in the hosting account.
+- Added supplier-ledger, real SDK session-storage, credential-validation and rendered-screen checks.
+
 ## Logo branding and contact details on printed forms
 
 - Added the saved transparent ASPACE logo to the header and as a faint background watermark on invoices and purchase slips.

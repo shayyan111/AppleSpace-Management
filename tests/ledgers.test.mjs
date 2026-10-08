@@ -13,7 +13,7 @@ test('Loans and existing balances do not create profit; service income and unpai
  assert.deepEqual(ledgerImpact(data),{income:150,expenses:30});assert.deepEqual(ledgerImpact(data,d=>d>='2026-10-01'),{income:100,expenses:30});
 });
 test('Opening/closing and reports are owner-only, while ledgers allow managers',()=>{
- for(const page of ['Daily closing','Reports','Record cleanup']){assert.equal(pageAllowed(page,'owner'),true);for(const role of ['manager','salesperson',''])assert.equal(pageAllowed(page,role),false);}
+ for(const page of ['Daily closing','Reports','Record cleanup','Settings']){assert.equal(pageAllowed(page,'owner'),true);for(const role of ['manager','salesperson',''])assert.equal(pageAllowed(page,role),false);}
  for(const page of ['Receivables ledger','Payables ledger']){assert.equal(pageAllowed(page,'owner'),true);assert.equal(pageAllowed(page,'manager'),true);assert.equal(pageAllowed(page,'salesperson'),false);}
 });
 test('A free stocked accessory reduces invoice profit without changing the amount billed',()=>{

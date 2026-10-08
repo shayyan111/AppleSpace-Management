@@ -7,5 +7,5 @@ export function ledgerRows(data,kind){
  return [...automatic,...manual].sort((a,b)=>b.date.localeCompare(a.date));
 }
 export function ledgerImpact(data,period=()=>true){const entries=(data.ledgerEntries||[]).filter(e=>period(e.record_date));return {income:sum(entries.filter(e=>e.category==='service_income'),'amount'),expenses:sum(entries.filter(e=>e.category==='expense_owed'),'amount')};}
-export const ownerPages=['Reports','Daily closing','Record cleanup'];
+export const ownerPages=['Reports','Daily closing','Record cleanup','Settings'];
 export function pageAllowed(page,role){if(ownerPages.includes(page))return role==='owner';if(['Purchases','Suppliers','Expenses','Settings','Receivables ledger','Payables ledger'].includes(page))return role==='owner'||role==='manager';return ['owner','manager','salesperson'].includes(role);}

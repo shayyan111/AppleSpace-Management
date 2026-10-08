@@ -1,0 +1,1 @@
+export function supplierLedger(data:Record<string,any>,supplierId:string):Array<{id:string;kind:string;purchaseId:string;reference:string;date:string;product:string;imei:string;bought:number;paid:number;method:string;notes:string;costPending:boolean;balance:number;balanceIncomplete:boolean}>;

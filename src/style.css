@@ -27,3 +27,13 @@ button:focus-visible{outline:2px solid #686e79;outline-offset:3px}
 
 .label-health{display:flex;align-items:center;gap:8px;margin:14px 0}.label-health input{width:auto}.bill-summary td small{display:block}
 .invoice-whatsapp{padding:20px 26px 26px}.invoice-recipient{display:flex;align-items:center;gap:12px;margin-bottom:18px}.invoice-recipient b{display:block;overflow-wrap:anywhere}.invoice-recipient small{display:block;margin-top:6px}.invoice-share-actions{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0}.invoice-whatsapp .form-hint{line-height:1.8}.invoice-whatsapp .error{margin:12px 0}
+
+/* Supplier statements and owner password verification */
+.supplier-ledger td small,.statement-summary small{display:block;margin-top:5px;color:var(--muted,#6b7280);font-size:12px;white-space:normal}
+.supplier-ledger td:nth-child(2){min-width:210px;max-width:350px}
+.supplier-ledger td:nth-child(n+3){white-space:nowrap}
+.owner-gate{max-width:480px;margin:32px auto;padding:32px}
+.owner-gate form{display:grid;gap:18px;margin:24px 0}
+.owner-gate>small{display:block;color:var(--muted,#6b7280);line-height:1.6}
+.owner-unlock{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px}
+.owner-unlock span{display:flex;align-items:center;gap:8px;color:var(--muted,#6b7280);font-size:13px}

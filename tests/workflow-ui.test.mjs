@@ -7,7 +7,7 @@ import {resolve} from 'node:path';
 import React from 'react';
 import {renderToStaticMarkup} from 'react-dom/server';
 
-const built=await build({stdin:{contents:`export {default as AccessoryForm} from './src/AccessoryForm.tsx'; export {default as ExpenseForm} from './src/ExpenseForm.tsx'; export {default as LabelForm} from './src/LabelForm.tsx'; export {default as InvoiceWhatsApp} from './src/InvoiceWhatsApp.tsx'; export {default as LedgerPage} from './src/LedgerPage.tsx'; export {default as Purchases} from './src/Purchases.tsx'; export {default as Customers} from './src/Customers.tsx'; export {default as RecordCleanup} from './src/RecordCleanup.tsx'; export {default as Inventory} from './src/Inventory.tsx'; export {default as SaleForm} from './src/SaleForm.tsx'; export {default as PurchaseForm} from './src/PurchaseForm.tsx'; export {default as CustomerCRM} from './src/CustomerCRM.tsx';`,resolveDir:process.cwd(),loader:'ts'},loader:{'.png':'dataurl','.ttf':'dataurl'},bundle:true,platform:'node',format:'esm',packages:'external',jsx:'automatic',write:false});
+const built=await build({stdin:{contents:`export {default as PasswordGate} from './src/PasswordGate.tsx'; export {default as SupplierStatement} from './src/SupplierStatement.tsx'; export {default as AccessoryForm} from './src/AccessoryForm.tsx'; export {default as ExpenseForm} from './src/ExpenseForm.tsx'; export {default as LabelForm} from './src/LabelForm.tsx'; export {default as InvoiceWhatsApp} from './src/InvoiceWhatsApp.tsx'; export {default as LedgerPage} from './src/LedgerPage.tsx'; export {default as Purchases} from './src/Purchases.tsx'; export {default as Customers} from './src/Customers.tsx'; export {default as RecordCleanup} from './src/RecordCleanup.tsx'; export {default as Inventory} from './src/Inventory.tsx'; export {default as SaleForm} from './src/SaleForm.tsx'; export {default as PurchaseForm} from './src/PurchaseForm.tsx'; export {default as CustomerCRM} from './src/CustomerCRM.tsx';`,resolveDir:process.cwd(),loader:'ts'},loader:{'.png':'dataurl','.ttf':'dataurl'},bundle:true,platform:'node',format:'esm',packages:'external',jsx:'automatic',write:false});
 const temp=resolve('node_modules/.cache/workflow-ui-'+process.pid+'.mjs');
 await mkdir(resolve('node_modules/.cache'),{recursive:true});
 await writeFile(temp,built.outputFiles[0].text);
@@ -97,4 +97,17 @@ test('Receivables offer balance reminders only for outstanding balances',()=>{
 test('WhatsApp PDF dialog names the customer and prepares the file before enabling sending',()=>{
  const html=renderToStaticMarkup(React.createElement(components.InvoiceWhatsApp,{sale:{id:'s',invoice_number:'AS-123'},items:[],payments:[],customer:{full_name:'Invoice customer',mobile:'03000000001'},phones:[]}));
  assert.match(html,/AS-123.pdf/);assert.match(html,/Invoice customer/);assert.match(html,/03000000001/);assert.match(html,/Preparing invoice PDF/);assert.doesNotMatch(html,/Send PDF via WhatsApp|Download PDF &amp; open WhatsApp/);
+});
+
+test('Owner password gate hides sensitive content before verification',()=>{
+ const props={required:true,page:'Reports',email:'owner@example.com',verify:async()=>{},onLock(){}};
+ const locked=renderToStaticMarkup(React.createElement(components.PasswordGate,props,React.createElement('p',null,'Private report revenue')));
+ assert.match(locked,/Unlock Reports/);assert.match(locked,/Owner ID/);assert.match(locked,/type="password"/);assert.doesNotMatch(locked,/Private report revenue/);
+ const publicPage=renderToStaticMarkup(React.createElement(components.PasswordGate,{...props,required:false},React.createElement('p',null,'Inventory')));
+ assert.equal(publicPage,'<p>Inventory</p>');
+});
+test('Supplier statement displays product/IMEI, separate payments and the final balance',()=>{
+ const records={purchases:[{id:'p',seller_id:'v',purchase_number:1,purchase_date:'2026-10-01T09:00:00Z',total_amount:100000,item_details:[{model:'iPhone 15',imei_1:'111111111111111'}]}],supplierPayments:[{id:'pay',purchase_id:'p',amount:50000,method:'cash',payment_date:'2026-10-02T09:00:00Z'}]};
+ const html=renderToStaticMarkup(React.createElement(components.SupplierStatement,{supplier:{id:'v',full_name:'Supplier'},data:records,setModal(){}}));
+ assert.match(html,/iPhone 15/);assert.match(html,/IMEI: 111111111111111/);assert.match(html,/Payment to supplier/);assert.match(html,/Bought/);assert.match(html,/Balance owed/);assert.match(html,/50,000/);assert.match(html,/Pay a specific purchase/);
 });

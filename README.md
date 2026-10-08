@@ -2,6 +2,8 @@
 
 AppleSpace store ERP built with React, TypeScript and Vite, using the existing shared Supabase database. This repository includes the workflow upgrades from V6.1, a grey/charcoal interface, repeatable setup, VS Code tasks, and automated checks. See [IMPLEMENTED-CHANGES.md](IMPLEMENTED-CHANGES.md) for the requested changes.
 
+For daily use on a shop laptop, see [SHOP-HANDOVER.md](SHOP-HANDOVER.md) for production hosting, owner/staff accounts, desktop installation, and the supplier ledger. Fresh app openings and page reloads now require sign-in; Settings, Reports, Daily Closing and Record Cleanup also require owner password verification.
+
 ## Open in VS Code on Windows
 
 Install Git, VS Code, and Node.js 24 LTS (minimum supported version: 22.12).
