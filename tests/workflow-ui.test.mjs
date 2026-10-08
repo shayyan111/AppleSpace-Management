@@ -80,7 +80,7 @@ test('Expense description is required only for Other categories',()=>{
  }
 });
 test('Accessory label form prints one shared label regardless of stock quantity',()=>{
- const html=renderToStaticMarkup(React.createElement(components.LabelForm,{item:{name:'Cable',quantity:100},accessory:true,safe:async f=>f()}));assert.doesNotMatch(html,/type="number"/);assert.match(html,/one shared accessory SKU/);assert.doesNotMatch(html,/Include battery health/);
+ const html=renderToStaticMarkup(React.createElement(components.LabelForm,{item:{name:'Cable',quantity:100},accessory:true,safe:async f=>f()}));assert.doesNotMatch(html,/type="number"/);assert.match(html,/one shared accessory SKU/);assert.doesNotMatch(html,/Include battery health/);assert.match(html,/<option value="40x25" selected="">/);assert.match(html,/50 × 30 mm/);assert.match(html,/100% \/ actual size/);
 });
 
 test('Accessory quantity additions request neither cost nor supplier; new purchases require supplier name',()=>{

@@ -26,10 +26,24 @@ test('Printed invoice includes PTA, both IMEIs and snapshot details with escaped
  const browser=dom();try{output.printInvoice(sale,items,payments,{...customer,full_name:'<script>unsafe</script>'},[]);await Promise.resolve();const html=browser.html();for(const text of ['Non-PTA','111111111111111','222222222222222','128GB','Typed billing name'])assert.ok(html.includes(text));assert.doesNotMatch(html,/<script>/);assert.match(html,/&lt;script&gt;/);}finally{browser.restore()}
 });
 test('Compact phone labels include PTA and IMEI with optional health and actual QR/barcode symbols',async()=>{
- const browser=dom();try{await output.printLabel(snapshot,{copies:1,includeHealth:false});await Promise.resolve();const html=browser.html();assert.match(html,/size:50mm 30mm/);assert.match(html,/Non-PTA/);assert.match(html,/111111111111111/);assert.doesNotMatch(html,/Health/);assert.match(html,/<svg /);assert.match(html,/data:image\/png;base64/);assert.match(html,/>QR</);await output.printLabel(snapshot);assert.match(browser.html(),/Health 91%/);}finally{browser.restore()}
+ const browser=dom();try{await output.printLabel(snapshot,{copies:1,includeHealth:false});await Promise.resolve();const html=browser.html();assert.match(html,/size:40mm 25mm/);assert.match(html,/Non-PTA/);assert.match(html,/111111111111111/);assert.doesNotMatch(html,/Health/);assert.match(html,/<svg /);assert.match(html,/data:image\/png;base64/);assert.match(html,/>QR</);await output.printLabel(snapshot);assert.match(browser.html(),/Health 91%/);}finally{browser.restore()}
 });
 test('100 accessory labels are identical and use one SKU without exposing purchase costs',async()=>{
  const browser=dom();try{await output.printLabel({name:'Cable',category:'Cable',sku:'ACC-CABLE',purchase_price:400},{accessory:true,copies:100});const html=browser.html();assert.equal((html.match(/class="stock-label"/g)||[]).length,100);const labels=html.match(/<div class="stock-label">[\s\S]*?(?=<div class="stock-label">|<\/body>)/g);assert.equal(new Set(labels).size,1);assert.match(html,/SKU: ACC-CABLE/);assert.doesNotMatch(html.replace(/<svg[\s\S]*?<\/svg>/g,'').replace(/<img[^>]*>/g,''),/purchase_price|\b400\b/);await assert.rejects(()=>output.printLabel({sku:'ACC-CABLE'},{accessory:true,copies:501}),/1 to 500/);}finally{browser.restore()}
+});
+
+test('Label printer paper sizes preserve product codes, quiet zones and actual-size pages',async()=>{
+ const browser=dom();try{
+  for(const [size,dimensions] of [['40x25','40mm 25mm'],['50x30','50mm 30mm']]){
+   await output.printLabel(snapshot,{size,copies:2});
+   const html=browser.html();assert.ok(html.includes(`@page{size:${dimensions};margin:0}`));
+   assert.equal((html.match(/class="stock-label"/g)||[]).length,2);
+   assert.match(html,/margin:0!important/);assert.match(html,/preserveAspectRatio="none"/);
+   assert.match(html,/111111111111111/);assert.match(html,/222222222222222/);
+   assert.match(html,/class="label-qr"/);assert.match(html,/class="label-barcode"/);
+  }
+  await assert.rejects(()=>output.printLabel(snapshot,{size:'unsupported'}),/supported label size/);
+ }finally{browser.restore()}
 });
 
 test('Invoice PDF generation paginates long item histories with phone details',async()=>{
