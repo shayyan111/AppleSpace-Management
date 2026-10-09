@@ -745,3 +745,339 @@ footer{
   border:2px solid #262A2F;
 }
 ::-webkit-scrollbar-thumb:hover{background:#696F77}
+
+
+/* =========================================================
+   AppleSpace Final Theme
+   Sidebar = charcoal
+   Main workspace = #ADABAE light silver-gray
+   ========================================================= */
+
+:root{
+  --as-charcoal:#23262B;
+  --as-charcoal-soft:#2B2F34;
+  --as-page:#ADABAE;
+  --as-page-soft:#B8B6B9;
+  --as-card:#C4C2C5;
+  --as-card-soft:#D0CED1;
+  --as-line:#99979B;
+  --as-text:#292C31;
+  --as-text-soft:#555960;
+  --as-muted:#6B6F75;
+  --as-white:#F7F7F8;
+}
+
+/* Main app background */
+html,body,#root,.app,main{
+  background:var(--as-page);
+  color:var(--as-text);
+}
+
+/* Sidebar stays charcoal */
+.sidebar{
+  background:linear-gradient(180deg,#202328 0%,#25292E 52%,#2B2F34 100%);
+  color:#ECEEF1;
+  border-right:1px solid #3B4047;
+  box-shadow:14px 0 34px rgba(0,0,0,.16);
+}
+
+.brand{color:#F7F7F8}
+.brand-mark span{color:#ADABAE}
+.brand small,.nav-label,.sidebar-bottom,.sidebar .user small{color:#979CA4}
+.sidebar .user{border-top-color:#3E434A}
+.avatar{
+  background:#ADABAE;
+  color:#25282D;
+}
+
+nav button{
+  color:#AEB3BA;
+  background:transparent;
+}
+nav button:hover{
+  background:#32373D;
+  color:#F4F5F6;
+}
+nav button.active{
+  background:#454A51;
+  color:#FFFFFF;
+  box-shadow:inset 3px 0 0 #ADABAE;
+}
+nav button.active svg{color:#D4D5D8}
+
+/* Header and main page */
+header{
+  background:#B5B3B6;
+  border-bottom:1px solid #99979B;
+  box-shadow:0 4px 14px rgba(0,0,0,.07);
+}
+
+.content{
+  background:var(--as-page);
+  color:var(--as-text);
+}
+
+h1,h2,h3{
+  color:#25282D;
+}
+.page-head p,
+p,
+small,
+.eyebrow,
+.muted,
+.connected,
+.breadcrumb,
+.breadcrumb b{
+  color:#5E6268;
+}
+
+/* Cards / panels */
+.metric,
+.panel,
+.modal,
+.cleanup-card,
+.ledger-card{
+  background:linear-gradient(180deg,#C7C5C8 0%,#BEBCC0 100%);
+  border:1px solid #9E9CA0;
+  box-shadow:0 10px 24px rgba(35,38,43,.08);
+  color:#292C31;
+}
+
+.metric h2,
+.stock-count b,
+.stock-row b,
+td b{
+  color:#25282D;
+}
+
+.metric>div>span:first-child,
+.metric small,
+.panel-head small{
+  color:#666A70;
+}
+
+.metric-icon,
+.phone-icon,
+.ai-symbol{
+  background:#AAA8AC;
+  color:#34373C;
+  border:1px solid #969499;
+}
+
+/* Buttons */
+button{
+  background:#AAA8AC;
+  border:1px solid #949297;
+  color:#2C2F34;
+}
+button:hover{
+  background:#9D9B9F;
+}
+
+.primary{
+  background:linear-gradient(180deg,#4A4F56,#34383E);
+  border:1px solid #34383E;
+  color:#F5F6F7;
+  box-shadow:0 6px 16px rgba(0,0,0,.16);
+}
+.primary:hover{
+  background:linear-gradient(180deg,#555B63,#3E434A);
+}
+
+.text-button{
+  background:transparent;
+  border:0;
+  box-shadow:none;
+  color:#4C5056;
+}
+.text-button:hover{
+  background:transparent;
+  color:#25282D;
+}
+
+/* Inputs */
+input,
+select,
+.field textarea,
+.field input,
+.field select{
+  background:#C8C6C9;
+  color:#292C31;
+  border:1px solid #969499;
+}
+input::placeholder,
+textarea::placeholder{
+  color:#777A80;
+}
+input:focus,
+select:focus,
+.field textarea:focus{
+  outline:2px solid #666A70;
+  border-color:#6F7379;
+}
+
+/* Tables */
+table{color:#303339}
+th{
+  background:#A6A4A8;
+  color:#34373C;
+  border-top:1px solid #929095;
+  border-bottom:1px solid #929095;
+}
+td{
+  color:#3D4147;
+  border-bottom:1px solid #AAA8AC;
+}
+tbody tr:nth-child(even) td{
+  background:rgba(255,255,255,.08);
+}
+tbody tr:hover td{
+  background:#B4B2B5;
+}
+
+/* Tags */
+.tag{
+  background:#A9A7AB;
+  color:#35383D;
+  border:1px solid #969499;
+}
+.tag.in_stock,.tag.paid,.tag.visible,.tag.open{
+  background:#AEB8B1;
+  color:#3F5548;
+  border-color:#98A39C;
+}
+.tag.sold,.tag.closed{
+  background:#AAA8AC;
+  color:#4A4E54;
+}
+.tag.partial,.tag.reserved{
+  background:#C0B596;
+  color:#6C603D;
+  border-color:#AA9D7D;
+}
+.tag.unpaid,.tag.repair{
+  background:#C0A7A0;
+  color:#714B42;
+  border-color:#AA918A;
+}
+
+/* Special sections */
+.daily-banner,
+.scan-box,
+.scan-card,
+.customer-detail-card>div,
+.message-preview,
+.phone-scanner-link{
+  background:#C1BFC2;
+  border:1px solid #9E9CA0;
+  color:#303339;
+}
+
+.bill-total-card{
+  background:linear-gradient(135deg,#2B2F34,#444950);
+  color:#F4F5F6;
+  border:1px solid #51575F;
+}
+.bill-total-card span,
+.bill-total-card small{
+  color:#C1C4CA;
+}
+
+.message p{
+  background:#B9B7BA;
+  border:1px solid #9F9DA1;
+  color:#3D4046;
+}
+.message.user p{
+  background:#3F444B;
+  color:#F2F3F5;
+  border:1px solid #4F555D;
+}
+
+/* Modal */
+.modal-overlay{
+  background:rgba(35,38,43,.48);
+  backdrop-filter:blur(7px);
+}
+.modal{
+  background:#C3C1C4;
+  border-color:#99979B;
+}
+.modal-head,
+.modal-foot,
+.form-section{
+  border-color:#A19FA3;
+}
+.modal-head button{
+  color:#565A60;
+}
+
+/* Inventory */
+.inventory-tabs button{
+  background:#B6B4B7;
+  border-color:#9F9DA1;
+}
+.inventory-tabs button[aria-selected="true"]{
+  background:#3F444B;
+  border-color:#3F444B;
+  color:#F5F6F7;
+  box-shadow:inset 0 -2px 0 #ADABAE;
+}
+
+.inventory-filters label,
+.inventory-result{
+  color:#5C6066;
+}
+.inventory-filters select{
+  background:#C8C6C9;
+  border-color:#9B999D;
+}
+
+/* Login */
+.login{
+  background:var(--as-page);
+}
+.login-story{
+  background:linear-gradient(180deg,#202328,#2B2F34);
+}
+.login-form h2{
+  color:#25282D;
+}
+.login-form p,
+.login-form>small{
+  color:#5F6369;
+}
+.login-tiles span{
+  background:#34393F;
+  border-color:#494F56;
+  color:#D6D8DC;
+}
+
+/* Scanner */
+.camera-scanner{
+  background:#292D32;
+  border-color:#444A51;
+  color:#E8EAED;
+}
+
+/* Chart */
+.chart-grid{
+  background:repeating-linear-gradient(to top,transparent 0,transparent 34px,#B1AFB2 35px,#B1AFB2 36px);
+  border-bottom-color:#9E9CA0;
+}
+.bar{background:#8F8D91}
+.bar.current{background:#3E434A}
+
+/* Footer / scrollbar */
+footer{
+  border-top-color:#9E9CA0;
+  color:#65696F;
+}
+::-webkit-scrollbar-track{background:#B1AFB2}
+::-webkit-scrollbar-thumb{
+  background:#858388;
+  border:2px solid #B1AFB2;
+}
+::-webkit-scrollbar-thumb:hover{
+  background:#727075;
+}
