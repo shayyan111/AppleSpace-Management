@@ -4,10 +4,10 @@ async function precacheBuild(){
  const cache=await caches.open(CACHE);
  await cache.addAll(['/','/index.html']);
  try{
-  const response=await fetch('/.vite/manifest.json',{cache:'no-store'});
+  const response=await fetch('/manifest.json',{cache:'no-store'});
   if(!response.ok)return;
   const manifest=await response.json();
-  const files=new Set(['/','.vite/manifest.json']);
+  const files=new Set(['/','/manifest.json']);
   for(const entry of Object.values(manifest)){
    if(entry?.file)files.add('/'+entry.file);
    for(const key of ['css','assets'])for(const file of (entry?.[key]||[]))files.add('/'+file);
