@@ -1081,3 +1081,20 @@ footer{
 ::-webkit-scrollbar-thumb:hover{
   background:#727075;
 }
+
+
+/* Offline-first status and sync queue */
+.live-dot.offline{background:#b17463;box-shadow:0 0 0 3px rgba(177,116,99,.14)}
+.sidebar-sync{display:block;margin:7px 0 0 12px;color:#c5c6ca!important;font-size:9px!important}
+.connection-pill{padding:7px 10px;border-radius:999px;font-size:10px;box-shadow:none}
+.connection-pill .live-dot{margin-right:2px}
+.connection-pill.online{background:#a7a5a8;border-color:#918f93;color:#292c31}
+.connection-pill.online:hover{background:#9b999d}
+.connection-pill.offline{background:#5b4742;border-color:#75584f;color:#f2d8d0}
+.connection-pill.offline .live-dot{background:#df9f8e}
+.offline-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:18px}
+.offline-queue-panel .panel-head{border-bottom:1px solid var(--as-line,#99979b)}
+.offline-queue-panel td:last-child{max-width:360px;white-space:normal;overflow-wrap:anywhere}
+.tag.pending,.tag.syncing{background:#b7af98;color:#5f583f;border-color:#9f967d}
+.tag.failed{background:#b99c95;color:#6d453c;border-color:#a3827a}
+@media(max-width:600px){.connection-pill{max-width:145px;overflow:hidden;text-overflow:ellipsis}.offline-actions button{flex:1}.offline-queue-panel td:last-child{max-width:220px}}
