@@ -88,7 +88,14 @@ export async function projectedStore(base:Row){
    if(n(p.paid)>0)out.payments.unshift({id:crypto.randomUUID(),sale_id:m.saleId,amount:n(p.paid),method:p.method||'cash',payment_date:at,offline_pending:true});
   } else if(a==='customer')out.customers.unshift({id:m.entityId,full_name:p.full_name,mobile:p.mobile,cnic:p.cnic,address:p.address,notes:p.notes,customer_kind:p.customer_kind||'customer',offline_pending:true});
   else if(a==='supplier')out.suppliers.unshift({id:m.entityId,full_name:p.full_name,mobile:p.mobile,cnic:p.cnic,notes:p.notes,seller_kind:p.seller_kind||'supplier',offline_pending:true});
-  else if(a==='customer_payment')out.payments.unshift({id:crypto.randomUUID(),sale_id:p.sale_id,amount:n(p.amount),method:p.method||'cash',payment_date:at,notes:p.notes,offline_pending:true});
+  else if(a==='accessory_purchase'){
+   const qty=n(p.quantity||1),cost=n(p.purchase_price),sale=p.sale_price===''?null:n(p.sale_price);
+   out.accessories.unshift({id:m.accessoryId,name:p.name,category:p.category||'Other',quantity:qty,purchase_price:cost,sale_price:sale,supplier_id:p.supplier_id||null,barcode_value:'OFF-'+q.requestId.slice(0,6).toUpperCase(),created_at:at,updated_at:at,offline_pending:true});
+  } else if(a==='accessory_restock'){
+   const acc=out.accessories.find((x:Row)=>x.id===p.accessory_id);if(acc){acc.quantity=n(acc.quantity)+n(p.quantity);if(p.sale_price!=='')acc.sale_price=n(p.sale_price);acc.offline_pending=true;}
+  } else if(a==='accessory_edit'){
+   const acc=out.accessories.find((x:Row)=>x.id===p.accessory_id);if(acc){Object.assign(acc,{name:p.name||acc.name,category:p.category||acc.category,sale_price:p.sale_price===''?acc.sale_price:n(p.sale_price),notes:p.notes,offline_pending:true});}
+  } else if(a==='customer_payment')out.payments.unshift({id:crypto.randomUUID(),sale_id:p.sale_id,amount:n(p.amount),method:p.method||'cash',payment_date:at,notes:p.notes,offline_pending:true});
   else if(a==='supplier_payment')out.supplierPayments.unshift({id:crypto.randomUUID(),purchase_id:p.purchase_id,amount:n(p.amount),method:p.method||'cash',payment_date:at,notes:p.notes,offline_pending:true});
   else if(a==='expense')out.expenses.unshift({id:crypto.randomUUID(),category:p.category,description:p.description,amount:n(p.amount),method:p.method||'cash',expense_date:at,inventory_item_id:p.inventory_item_id||null,offline_pending:true});
   else if(a==='repair'){const item=out.inventory.find((x:Row)=>x.id===p.inventory_id);if(item)item.status=p.repairing?'repair':'in_stock';}
@@ -125,6 +132,7 @@ export async function syncPendingActions(client:SupabaseClient,uploadPhoto:(file
     const {data,error}=await client.rpc('erp_action',{p:payload});if(error)throw error;
     if(item.meta.inventoryId&&data?.inventory_id)await rewriteTempReference(item.meta.inventoryId,data.inventory_id);
     if(item.meta.entityId&&data?.id)await rewriteTempReference(item.meta.entityId,data.id);
+    if(item.meta.accessoryId&&data?.id)await rewriteTempReference(item.meta.accessoryId,data.id);
     await resolveContact(client,item);
     await deleteQueue(item.id);synced++;
    }catch(error:any){
