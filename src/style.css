@@ -58,3 +58,285 @@ button:focus-visible{outline:2px solid #686e79;outline-offset:3px}
 .camera-scanner video{object-fit:contain}.camera-scanner video[hidden]{display:none}.camera-actions{display:flex;gap:8px;flex-wrap:wrap}.scan-zoom{display:flex;align-items:center;gap:14px;font-size:12px;margin-top:14px}.scan-zoom input{flex:1;min-width:70px;padding:0}.scan-control-error{color:#f2c1c1;font-size:12px;margin:12px 0 0}
 
 .page-loading{display:flex;align-items:center;justify-content:center;gap:10px;padding:32px;color:#666;font-size:13px}.pagination{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:14px 20px;border-top:1px solid var(--line);font-size:12px}.pagination>div{display:flex;align-items:center;gap:10px}.pagination select{padding:6px}.pagination button{padding:8px 12px}.error button{margin-left:12px}@media(max-width:600px){.pagination{padding:12px}.pagination>div{gap:6px}}
+
+
+/* =========================================================
+   AppleSpace Charcoal + Silver Theme
+   ========================================================= */
+:root{
+  color:#eceff3;
+  background:#17191d;
+  --accent:#bfc3ca;
+  --accent-strong:#d7d9de;
+  --muted:#9a9fa8;
+  --line:#3a3e45;
+  --surface:#22252a;
+  --surface-2:#2a2e34;
+  --surface-3:#31363d;
+  --charcoal:#17191d;
+  --charcoal-soft:#1d2025;
+  --silver:#c7cbd1;
+}
+
+body{background:#17191d;color:#eceff3}
+.app,main{background:#17191d}
+header{background:#1d2025;border-bottom-color:#34383f}
+.content{color:#eceff3}
+
+.sidebar,.login-story{
+  background:linear-gradient(180deg,#15171a 0%,#1e2126 100%);
+  color:#e6e8ec;
+  border-right:1px solid #30343a;
+  box-shadow:8px 0 30px #00000022;
+}
+.brand{color:#f0f2f5}
+.brand small,.nav-label,.sidebar-bottom,.sidebar .user small{color:#8f949d}
+.brand-mark span{color:#b9bdc4}
+nav button{color:#a7abb3}
+nav button:hover{background:#292d33;color:#f2f3f5}
+nav button.active{
+  background:linear-gradient(90deg,#3b4048,#31363d);
+  color:#f4f5f7;
+  box-shadow:inset 3px 0 0 #c9cdd3;
+}
+nav button.active svg{color:#d7dae0}
+.sidebar .user{border-top-color:#34383f;color:#e5e7eb}
+.avatar{background:#c9cdd3;color:#24272c}
+
+h1,h2,h3{color:#f1f3f5}
+p{color:#b4b8c0}
+small,.eyebrow,.breadcrumb,.breadcrumb b,.page-head p,.connected,.muted{color:#969ba4}
+
+button{
+  background:#2b2f35;
+  border-color:#444950;
+  color:#e7e9ed;
+}
+button:hover{background:#353a41}
+button:disabled{opacity:.5}
+.primary{
+  background:linear-gradient(180deg,#d6d9de,#b9bec6);
+  border-color:#d9dce1;
+  color:#202328;
+  box-shadow:0 6px 18px #00000024;
+}
+.primary:hover{
+  background:linear-gradient(180deg,#e2e4e8,#c8ccd2);
+  color:#17191d;
+}
+.text-button{color:#c2c6cc}
+.text-button:hover{color:#f1f2f4}
+
+input,select,.field textarea{
+  background:#24282e;
+  color:#edf0f3;
+  border-color:#41464e;
+}
+input::placeholder,.field textarea::placeholder{color:#777d87}
+input:focus,select:focus,.field textarea:focus{
+  outline:2px solid #858b95;
+  outline-offset:1px;
+  border-color:#6f7680;
+}
+.search input,.scan-box input{color:#eceff3}
+.search input::placeholder,.scan-box input::placeholder{color:#7f858f}
+
+.metric,.panel{
+  background:linear-gradient(180deg,#25292f 0%,#22262b 100%);
+  border-color:#3a3f46;
+  box-shadow:0 10px 28px #00000012;
+}
+.metric>div>span:first-child,.metric small,.panel-head small{color:#959aa4}
+.metric-icon,.phone-icon,.ai-symbol{
+  background:#343941;
+  color:#c8ccd2;
+}
+.metric h2,.stock-count b,.stock-row b{color:#f1f3f5}
+.panel-head{border-bottom-color:#3a3f46}
+
+table{color:#d7dbe1}
+th{
+  color:#a7acb5;
+  background:#2b3036;
+  border-top-color:#3d424a;
+  border-bottom-color:#3d424a;
+}
+td{
+  color:#c2c6ce;
+  border-bottom-color:#353a41;
+}
+td b{color:#f0f2f5}
+tr:hover td{background:#292e34}
+
+.tag{
+  background:#343941;
+  color:#c8ccd2;
+  border:1px solid #454b53;
+}
+.tag.in_stock,.tag.paid,.tag.visible,.tag.open{background:#2f3a36;color:#c9ddd4;border-color:#44534d}
+.tag.sold,.tag.closed{background:#363b42;color:#bfc5cd}
+.tag.partial,.tag.reserved{background:#49402b;color:#e4d39a;border-color:#665a3c}
+.tag.unpaid,.tag.repair{background:#4a332f;color:#e3b3a8;border-color:#67463f}
+.tag.owner{background:#3f434a;color:#e3e5e8}
+.tag.neutral{background:#343941;color:#c8ccd2}
+
+.stock-row{border-bottom-color:#363a40;color:#9da2ab}
+.status-dot{background:#aeb3ba}
+.status-dot.reserved{background:#d8c27c}
+.status-dot.sold{background:#a9afb7}
+.status-dot.repair{background:#d59b8f}
+
+.chart-grid{
+  background:repeating-linear-gradient(to top,transparent 0,transparent 34px,#343941 35px,#343941 36px);
+  border-bottom-color:#41464d;
+}
+.bar{background:#5c626b}
+.bar.current{background:#c6cad0}
+.bar-column small,.chart-empty{color:#8f949d}
+
+.insight{
+  background:#262b31;
+  border-color:#3a4047;
+}
+.insight p{color:#a5aab3}
+.insight-rule{background:#3d4249}
+
+.toolbar,.report-tools,.chat-input,.pagination{border-color:#3a3f46}
+.row-actions button{border-color:#454a52;color:#c2c6cd}
+.empty{color:#969ba3}
+.empty svg{color:#626871}
+.info{
+  background:#2b2c27;
+  color:#c6bb8c;
+  border-top-color:#49483e;
+}
+.error{
+  color:#efb6aa;
+  background:#442d29;
+  border-color:#6d443c;
+}
+.toast{
+  background:#d0d3d8;
+  color:#202329;
+  box-shadow:0 14px 38px #00000055;
+}
+.negative,.battery-low{color:#e49a7d}
+
+.daily-banner{
+  background:linear-gradient(135deg,#2a2f35,#23272c);
+  border-color:#41464e;
+}
+.daily-banner p,.report-title p,.scan-intro p,.settings-grid p,.ledger-card p,.cleanup-card p{color:#9da2ab}
+
+.scan-box{
+  border-color:#474c54;
+  background:#20242a;
+  color:#aeb3bb;
+}
+.scan-card{
+  border-color:#3e434b;
+  color:#aeb3bb;
+  background:#24282e;
+}
+.scan-card h3{color:#eceff2}
+
+.message p{
+  background:#2d3238;
+  border-color:#40464e;
+  color:#cbd0d6;
+}
+.message.user p{
+  background:#c9cdd3;
+  color:#202329;
+}
+.assistant-prompts button{
+  background:#272b31;
+  border-color:#3f444c;
+  color:#b6bbc3;
+}
+
+.modal-overlay{background:#090a0cbb}
+.modal{
+  background:#20242a;
+  border-color:#42474f;
+  box-shadow:0 32px 110px #00000088;
+}
+.modal-head{border-bottom-color:#3b4047}
+.modal-head button{color:#b7bbc3}
+.field>span{color:#a8adb5}
+.field b{color:#d3c09a}
+.field input,.field select{background:#252a30;border-color:#424850}
+.form-section{border-bottom-color:#3a3f46;color:#c4c8ce}
+.form-hint{color:#959ba4}
+.modal-foot{border-top-color:#3a3f46}
+
+.login{
+  background:#17191d;
+}
+.login-story .eyebrow,.login-story p,.login-story small{color:#9aa0a9}
+.login-story h1{color:#f1f3f5}
+.login-tiles span{
+  border-color:#484e56;
+  background:#2a2f35;
+  color:#b5bac2;
+}
+.login-form h2{color:#f2f4f6}
+.login-form p,.login-form>small{color:#969ca5}
+
+.inventory-tabs button[aria-selected=true]{
+  border-color:#bfc4cb;
+  color:#f1f2f4;
+  background:#353a41;
+}
+.inventory-filters label,.inventory-result{color:#9da2ab}
+.inventory-filters select{background:#252a30;border-color:#41464e}
+.repair-checkbox,.crm-grid input[type=checkbox]{accent-color:#c1c5cb}
+
+.bill-total-card{
+  background:linear-gradient(135deg,#111317,#25292f);
+  color:#f2f3f5;
+  border:1px solid #3e434b;
+  box-shadow:0 10px 30px #0000002e;
+}
+.bill-total-card span,.bill-total-card small{color:#9ca2ab}
+
+.camera-scanner{
+  background:#111318;
+  border-color:#3a4048;
+  color:#e8eaed;
+}
+.camera-head button{color:#d7dae0;border-color:#484e56}
+.scan-guide,.camera-tip{color:#abb0b8}
+
+.customer-detail-row td{background:#252a30}
+.customer-detail-card>div{
+  border-color:#3c4249;
+  background:#272c32;
+}
+.customer-detail-card span{color:#8f959e}
+.customer-history p,.campaign-selection>small,.campaign-queue p{color:#9da2ab}
+.message-preview,.phone-scanner-link{background:#282d33}
+
+.cleanup-card .danger{
+  background:#8b3932;
+  border-color:#a14940;
+}
+.ledger-summary span{color:#999fa8}
+.ledger-summary strong{color:#f2f3f5}
+.owner-gate>small,.owner-unlock span{color:#989ea7}
+
+.seller-photo-preview{background:#111318}
+.camera-device{color:#e9ebee}
+.photo-camera video{background:#0b0c0f}
+.page-loading{color:#9da2ab}
+
+footer{
+  border-top-color:#353a41;
+  color:#8f949d;
+}
+footer span{color:#777d86}
+
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:#191c20}
+::-webkit-scrollbar-thumb{background:#3d4249;border-radius:10px;border:2px solid #191c20}
+::-webkit-scrollbar-thumb:hover{background:#515760}
