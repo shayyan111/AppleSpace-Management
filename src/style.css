@@ -340,3 +340,103 @@ footer span{color:#777d86}
 ::-webkit-scrollbar-track{background:#191c20}
 ::-webkit-scrollbar-thumb{background:#3d4249;border-radius:10px;border:2px solid #191c20}
 ::-webkit-scrollbar-thumb:hover{background:#515760}
+
+
+/* Refined AppleSpace charcoal + silver/gray balance */
+:root{
+  --accent:#b9bec6;
+  --accent-strong:#d4d7dc;
+  --muted:#9da2aa;
+  --line:#4a4f56;
+  --surface:#2a2d32;
+  --surface-2:#32363b;
+  --surface-3:#3a3f45;
+  --charcoal:#23262b;
+  --charcoal-soft:#2b2f34;
+  --silver:#c4c8ce;
+}
+
+body,.app,main{background:#2b2e33;color:#eceff3}
+header{background:#3a3e44;border-bottom-color:#555b63}
+.content{background:#2b2e33}
+
+.sidebar,.login-story{
+  background:linear-gradient(180deg,#22252a 0%,#2b2f34 100%);
+  border-right:1px solid #444951;
+}
+nav button:hover{background:#383d43}
+nav button.active{
+  background:linear-gradient(90deg,#4b5058,#3f444b);
+  box-shadow:inset 3px 0 0 #c6cad0;
+}
+
+button{
+  background:#44494f;
+  border-color:#5a6068;
+}
+button:hover{background:#50565e}
+.primary{
+  background:linear-gradient(180deg,#d5d8dd,#b6bbc3);
+  border-color:#d9dce1;
+  color:#23262b;
+}
+
+input,select,.field textarea{
+  background:#3a3f45;
+  border-color:#575d65;
+}
+input:focus,select:focus,.field textarea:focus{
+  border-color:#8d949e;
+  outline-color:#777e88;
+}
+
+.metric,.panel{
+  background:linear-gradient(180deg,#383c42 0%,#33373c 100%);
+  border-color:#51565e;
+  box-shadow:0 10px 24px #00000016;
+}
+.metric-icon,.phone-icon,.ai-symbol{background:#4a4f56}
+th{background:#444950;border-color:#565c64;color:#c2c6cd}
+td{border-bottom-color:#4c5158;color:#d0d4da}
+tr:hover td{background:#3d4248}
+
+.modal{
+  background:#34383e;
+  border-color:#575d65;
+}
+.modal-head,.modal-foot{border-color:#50565e}
+
+.daily-banner{
+  background:linear-gradient(135deg,#3b4046,#33373c);
+  border-color:#555b63;
+}
+
+.scan-box,.scan-card,.customer-detail-card>div,.message-preview,.phone-scanner-link{
+  background:#383d43;
+  border-color:#535961;
+}
+
+.message p{
+  background:#3d4248;
+  border-color:#555b63;
+}
+.message.user p{
+  background:#c6cad0;
+  color:#23262b;
+}
+
+.bill-total-card{
+  background:linear-gradient(135deg,#24272c,#3a3f45);
+  border-color:#555b63;
+}
+
+.login{background:#2b2e33}
+.login-tiles span{
+  background:#3a3f45;
+  border-color:#555b63;
+}
+
+.inventory-tabs button[aria-selected=true]{
+  background:#4a4f56;
+  border-color:#b8bdc5;
+}
