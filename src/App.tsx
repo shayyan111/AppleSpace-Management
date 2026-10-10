@@ -22,7 +22,7 @@ const LedgerPage=lazy(()=>import('./LedgerPage'));
 import {ledgerRows,ledgerImpact,pageAllowed,ownerPages} from './ledger.mjs';
 import type {FormEvent,ReactNode} from 'react';
 import {LayoutDashboard,Smartphone,ShoppingBag,Receipt,Users,Truck,Wallet,BookOpen,ScanLine,Sparkles,Settings,Search,Plus,ArrowUpRight,ChevronRight,LogOut,X,Printer,Download,RefreshCw,Globe,Pencil,CheckCircle2,AlertCircle,Menu,Send,ShieldCheck,Camera,Clock,Package,TrendingUp,Trash2} from 'lucide-react';
-import {db,readStore,act,verifyOwnerPassword,initializeOfflineState,retryFailed,setNetworkState,subscribeOfflineState,syncOffline,pendingDetails,createStaffUser,updateStaffUser,deleteStaffUser,loginWithIdentifier} from './api';
+import {db,readStore,act,verifyOwnerPassword,initializeOfflineState,retryFailed,setNetworkState,subscribeOfflineState,syncOffline,pendingDetails,createStaffUser,updateStaffUser,deleteStaffUser,loginWithIdentifier,updatePhonePurchase,deletePhonePurchase} from './api';
 import {sum,due,profit,money,localDay,accountBalance} from './math.mjs';
 import {exportRows,printLabel,printInvoice,printSlip,purchaseSlipPDF,printReport,download,whatsapp} from './outputActions';
 type Row=Record<string,any>;
@@ -98,7 +98,11 @@ export default function App(){
  const reportData=useMemo(()=>page==='Reports'?buildReportRows():[],[data,report,from,to,page]);
  const {visible:reportVisible,pagination:reportPagination}=usePagination<Row>(reportData,JSON.stringify([report,from,to]));
  async function login(e:FormEvent<HTMLFormElement>){e.preventDefault();const f=new FormData(e.currentTarget);setBusy(true);await safe(async()=>{await loginWithIdentifier(String(f.get('identifier')),String(f.get('password')))});setBusy(false)}
- async function submit(e:FormEvent<HTMLFormElement>){e.preventDefault();if(busy)return;const form=e.currentTarget;const p=Object.fromEntries(new FormData(form)) as Row;setBusy(true);if(p.extras_json){p.extras=JSON.parse(p.extras_json);delete p.extras_json;}const ok=await safe(async()=>{if(modal?.action==='staff'){
+ async function submit(e:FormEvent<HTMLFormElement>){e.preventDefault();if(busy)return;const form=e.currentTarget;const p=Object.fromEntries(new FormData(form)) as Row;setBusy(true);if(p.extras_json){p.extras=JSON.parse(p.extras_json);delete p.extras_json;}const ok=await safe(async()=>{if(modal?.action==='purchase_edit'){
+ const payload={purchase_id:modal.purchase.id,inventory_id:modal.item.id,model:String(p.model),storage:String(p.storage),color:String(p.color||''),imei_1:String(p.imei_1),imei_2:String(p.imei_2||''),serial_number:String(p.serial_number||''),battery_health:String(p.battery_health||''),pta_status:String(p.pta_status),purchase_price:String(p.purchase_price),sale_price:String(p.sale_price||''),condition_grade:String(p.condition_grade||''),warranty_notes:String(p.warranty_notes||''),public_notes:String(p.public_notes||''),notes:String(p.notes||modal.purchase.notes||'')};
+ await updatePhonePurchase(payload);setModal(null);setNotice('Purchase updated. Seller details were not changed.');await refresh(true);return true;
+}
+if(modal?.action==='staff'){
  if(!navigator.onLine)throw Error('Internet is required to create or change staff login access.');
  if(!modal.item){
   const username=String(p.username||'').trim(),email=String(p.email||'').trim();if(!username&&!email)throw Error('Enter a username or email for this staff login.');await createStaffUser({email:email||undefined,password:String(p.password),username:username||undefined,full_name:String(p.full_name),role:String(p.role),is_active:String(p.is_active)!=='false',website_portal_access:String(p.website_portal_access)==='true'});
