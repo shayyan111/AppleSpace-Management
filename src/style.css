@@ -1098,3 +1098,203 @@ footer{
 .tag.pending,.tag.syncing{background:#b7af98;color:#5f583f;border-color:#9f967d}
 .tag.failed{background:#b99c95;color:#6d453c;border-color:#a3827a}
 @media(max-width:600px){.connection-pill{max-width:145px;overflow:hidden;text-overflow:ellipsis}.offline-actions button{flex:1}.offline-queue-panel td:last-child{max-width:220px}}
+
+
+/* =========================================================
+   Global form readability fix
+   Applies across purchases, sales, customers, suppliers,
+   expenses, inventory, settings, reports, scanner and modals.
+   ========================================================= */
+
+/* Primary form labels and section headings */
+.field > span,
+.form-section,
+.modal .field > span,
+.settings-grid .field > span,
+.report-tools label,
+.inventory-filters label,
+.campaign-selection label,
+.scan-box label,
+.login-form label,
+.cleanup-card label,
+.ledger-card label,
+.customer-page label,
+.crm-grid label,
+.seller-photo-field > label,
+.scan-zoom,
+.camera-device,
+.setting-row > span {
+  color:#151515 !important;
+  font-weight:700 !important;
+}
+
+/* Form section dividers need stronger contrast on #ADABAE */
+.form-section {
+  color:#111111 !important;
+  border-bottom-color:#8F8D91 !important;
+  letter-spacing:.01em;
+}
+
+/* Required-field marker */
+.field > span b,
+.form-section b {
+  color:#2A2A2A !important;
+  font-weight:800 !important;
+}
+
+/* Helper / explanatory text under form controls */
+.form-hint,
+.modal-foot small,
+.field small,
+.login-form p,
+.login-form > small,
+.report-title p,
+.inventory-result,
+.scan-intro p,
+.camera-tip,
+.campaign-selection > small,
+.campaign-queue p,
+.owner-gate > small,
+.customer-history p,
+.cleanup-card p,
+.ledger-card p,
+.settings-grid p {
+  color:#343434 !important;
+}
+
+/* Modal and panel titles */
+.modal-head h2,
+.panel-head h3,
+.settings-grid h3,
+.cleanup-card h3,
+.ledger-card h3,
+.customer-page-head h2,
+.scan-intro h2,
+.bill-summary h3,
+.section-title {
+  color:#111111 !important;
+  font-weight:800 !important;
+}
+
+/* Page headings */
+.page-head h1,
+.report-title h2 {
+  color:#111111 !important;
+  font-weight:800 !important;
+}
+
+/* Input/select text stays very dark for readability */
+input,
+select,
+textarea,
+.field input,
+.field select,
+.field textarea {
+  color:#181818 !important;
+  font-weight:500;
+}
+
+/* Placeholder contrast */
+input::placeholder,
+textarea::placeholder {
+  color:#626262 !important;
+  opacity:1;
+}
+
+/* Disabled and read-only fields should still remain readable */
+input:disabled,
+select:disabled,
+textarea:disabled,
+input[readonly] {
+  color:#303030 !important;
+  -webkit-text-fill-color:#303030 !important;
+  opacity:.82;
+}
+
+/* Tables and detail labels on light workspace */
+th {
+  color:#1F1F1F !important;
+  font-weight:700 !important;
+}
+td {
+  color:#2A2A2A !important;
+}
+td b,
+.customer-detail-card b,
+.statement-summary b,
+.stock-row b {
+  color:#151515 !important;
+}
+
+/* Detail card labels */
+.customer-detail-card span,
+.ledger-summary span,
+.statement-summary small,
+.phone-cell small,
+.stock-count span,
+.metric > div > span:first-child,
+.metric small,
+.panel-head small {
+  color:#444444 !important;
+}
+
+/* Keep dark widgets readable with light text */
+.bill-total-card,
+.bill-total-card h3,
+.bill-total-card strong,
+.camera-scanner,
+.camera-scanner h3,
+.camera-scanner .camera-tip,
+.login-story,
+.login-story h1,
+.login-story .brand,
+.login-story .eyebrow,
+.login-story p,
+.login-story small,
+.sidebar,
+.sidebar .brand,
+.sidebar .nav-label,
+.sidebar .sidebar-bottom,
+.sidebar .user,
+.message.user p {
+  color:#F3F4F6 !important;
+}
+
+/* Dark sidebar keeps its muted hierarchy */
+.sidebar .brand small,
+.sidebar .nav-label,
+.sidebar .sidebar-bottom,
+.sidebar .user small {
+  color:#AEB2B9 !important;
+}
+
+/* Buttons should not inherit forced black labels */
+button,
+button span {
+  font-weight:600;
+}
+.primary,
+.primary span,
+nav button,
+nav button span,
+.connection-pill,
+.connection-pill span {
+  color:inherit !important;
+}
+
+/* Dark modal overlays / special dark blocks */
+.bill-total-card span,
+.bill-total-card small {
+  color:#D0D3D8 !important;
+}
+
+/* Mobile: preserve label visibility */
+@media(max-width:600px){
+  .field > span,
+  .form-section,
+  .report-tools label,
+  .inventory-filters label {
+    color:#111111 !important;
+    font-weight:700 !important;
+  }
+}
