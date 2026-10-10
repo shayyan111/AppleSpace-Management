@@ -64,7 +64,7 @@ function metaFor(payload:Row){
 }
 export async function enqueueAction(payload:Row,opts:{photo?:File;userId?:string;requestId?:string}={}){
  const now=new Date().toISOString(),requestId=opts.requestId||String(payload.request_id||crypto.randomUUID());
- const clean={...payload,request_id:requestId};delete clean.photo;
+ const clean:Row={...payload,request_id:requestId};delete clean.photo;
  const item:OfflineQueueItem={id:crypto.randomUUID(),requestId,payload:clean,createdAt:now,updatedAt:now,status:'pending',retries:0,photo:opts.photo,photoName:opts.photo?.name,userId:opts.userId,meta:metaFor(clean)};
  await putQueue(item);return item;
 }
@@ -127,7 +127,7 @@ export async function syncPendingActions(client:SupabaseClient,uploadPhoto:(file
   for(const original of rows){
    let item={...original,status:'syncing' as QueueStatus,updatedAt:new Date().toISOString()};await putQueue(item);
    try{
-    let payload={...item.payload,request_id:item.requestId};
+    let payload:Row={...item.payload,request_id:item.requestId};
     if(item.photo&&item.userId&&!payload.photo_url){const file=new File([item.photo],item.photoName||'seller-photo.jpg',{type:item.photo.type||'image/jpeg'});payload.photo_url=await uploadPhoto(file,item.userId);}
     const {data,error}=await client.rpc('erp_action',{p:payload});if(error)throw error;
     if(item.meta.inventoryId&&data?.inventory_id)await rewriteTempReference(item.meta.inventoryId,data.inventory_id);
