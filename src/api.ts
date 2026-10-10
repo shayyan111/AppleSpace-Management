@@ -84,3 +84,18 @@ export async function syncOffline(){
  return result;
 }
 export {getOfflineState,initializeOfflineState,retryFailed,setNetworkState,subscribeOfflineState,pendingDetails};
+
+
+export async function createStaffUser(input:{email:string;password:string;full_name:string;role:string;is_active:boolean}){
+ const {data,error}=await db.functions.invoke('staff-admin',{body:{action:'create',...input}});
+ if(error)throw error;
+ if(data?.error)throw Error(data.error);
+ return data;
+}
+
+export async function deleteStaffUser(userId:string){
+ const {data,error}=await db.functions.invoke('staff-admin',{body:{action:'delete',user_id:userId}});
+ if(error)throw error;
+ if(data?.error)throw Error(data.error);
+ return data;
+}
