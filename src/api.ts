@@ -99,3 +99,11 @@ export async function deleteStaffUser(userId:string){
  if(data?.error)throw Error(data.error);
  return data;
 }
+
+
+export async function updateStaffUser(input:{user_id:string;full_name:string;role:string;is_active:boolean;website_portal_access:boolean}){
+ const {data,error}=await db.functions.invoke('staff-admin',{body:{action:'update',...input}});
+ if(error)throw error;
+ if(data?.error)throw Error(data.error);
+ return data;
+}
