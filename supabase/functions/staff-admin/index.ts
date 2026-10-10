@@ -47,12 +47,18 @@ Deno.serve(async (req: Request) => {
     const body = await req.json();
     const action = String(body?.action || "");
 
+    const setWebsiteAccess = async (userId: string, active: boolean) => {
+      const { error } = await admin.rpc("erp_set_website_manager", { p_user_id: userId, p_active: active });
+      if (error) throw error;
+    };
+
     if (action === "create") {
       const email = String(body?.email || "").trim().toLowerCase();
       const password = String(body?.password || "");
       const fullName = String(body?.full_name || "").trim();
       const role = String(body?.role || "salesperson");
       const isActive = body?.is_active !== false;
+      const websitePortalAccess = body?.website_portal_access === true;
 
       if (!email || !/^\S+@\S+\.\S+$/.test(email)) return json({ error: "Valid email required" }, 400);
       if (password.length < 8) return json({ error: "Password must be at least 8 characters" }, 400);
@@ -77,7 +83,36 @@ Deno.serve(async (req: Request) => {
         return json({ error: insertError.message }, 400);
       }
 
-      return json({ id: userId, email, full_name: fullName, role, is_active: isActive });
+      try {
+        await setWebsiteAccess(userId, websitePortalAccess);
+      } catch (error) {
+        await admin.auth.admin.deleteUser(userId).catch(() => {});
+        return json({ error: error instanceof Error ? error.message : "Could not assign website portal access" }, 400);
+      }
+
+      return json({ id: userId, email, full_name: fullName, role, is_active: isActive, website_portal_access: websitePortalAccess });
+    }
+
+    if (action === "update") {
+      const userId = String(body?.user_id || "");
+      const fullName = String(body?.full_name || "").trim();
+      const role = String(body?.role || "salesperson");
+      const isActive = body?.is_active !== false;
+      const websitePortalAccess = body?.website_portal_access === true;
+
+      if (!userId) return json({ error: "Staff user ID required" }, 400);
+      if (!fullName) return json({ error: "Full name required" }, 400);
+      if (!["owner", "manager", "salesperson"].includes(role)) return json({ error: "Invalid role" }, 400);
+
+      const { error: updateError } = await admin
+        .from("user_profiles")
+        .update({ full_name: fullName, role, is_active: isActive })
+        .eq("id", userId);
+
+      if (updateError) return json({ error: updateError.message }, 400);
+
+      await setWebsiteAccess(userId, websitePortalAccess);
+      return json({ id:userId, full_name:fullName, role, is_active:isActive, website_portal_access:websitePortalAccess });
     }
 
     if (action === "delete") {
@@ -102,6 +137,7 @@ Deno.serve(async (req: Request) => {
         if ((count || 0) <= 1) return json({ error: "The last active owner cannot be deleted" }, 400);
       }
 
+      await setWebsiteAccess(userId, false);
       const { error: deleteError } = await admin.auth.admin.deleteUser(userId);
       if (deleteError) return json({ error: deleteError.message }, 400);
 
