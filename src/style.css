@@ -2035,3 +2035,17 @@ footer{
   outline:2px solid #7C828B !important;
   outline-offset:2px;
 }
+
+
+/* Staff management actions */
+.danger-outline{
+  background:#F7F7F8 !important;
+  border:1px solid #C98F86 !important;
+  color:#8A3F35 !important;
+  box-shadow:none !important;
+}
+.danger-outline:hover{
+  background:#F3E4E1 !important;
+  border-color:#B9756A !important;
+  color:#73332B !important;
+}
