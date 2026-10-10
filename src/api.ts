@@ -123,3 +123,16 @@ export async function loginWithIdentifier(identifier:string,password:string){
  const {error:setError}=await db.auth.setSession({access_token:data.access_token,refresh_token:data.refresh_token});
  if(setError)throw setError;
 }
+
+
+export async function updatePhonePurchase(payload:Record<string,unknown>){
+ const {data,error}=await db.rpc('erp_update_phone_purchase',{p:payload});
+ if(error)throw error;
+ return data;
+}
+
+export async function deletePhonePurchase(purchaseId:string){
+ const {data,error}=await db.rpc('erp_delete_phone_purchase',{p_purchase_id:purchaseId});
+ if(error)throw error;
+ return data;
+}
