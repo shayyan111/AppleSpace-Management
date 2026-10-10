@@ -1,4 +1,4 @@
-const CACHE='applespace-shell-v2';
+const CACHE='applespace-shell-v3';
 
 async function precacheBuild(){
  const cache=await caches.open(CACHE);
@@ -54,16 +54,13 @@ self.addEventListener('fetch',event=>{
 
  event.respondWith((async()=>{
   const cache=await caches.open(CACHE);
-  const cached=await cache.match(req);
-  if(cached){
-   fetch(req).then(fresh=>{if(fresh.ok)cache.put(req,fresh.clone());}).catch(()=>{});
-   return cached;
-  }
   try{
-   const fresh=await fetch(req);
+   const fresh=await fetch(req,{cache:'no-store'});
    if(fresh.ok)cache.put(req,fresh.clone());
    return fresh;
   }catch{
+   const cached=await cache.match(req);
+   if(cached)return cached;
    throw new Error('Offline and resource not cached');
   }
  })());
