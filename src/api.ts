@@ -86,7 +86,7 @@ export async function syncOffline(){
 export {getOfflineState,initializeOfflineState,retryFailed,setNetworkState,subscribeOfflineState,pendingDetails};
 
 
-export async function createStaffUser(input:{email:string;password:string;username?:string;full_name:string;role:string;is_active:boolean;website_portal_access:boolean}){
+export async function createStaffUser(input:{email?:string;password:string;username?:string;full_name:string;role:string;is_active:boolean;website_portal_access:boolean}){
  const {data,error}=await db.functions.invoke('staff-admin',{body:{action:'create',...input}});
  if(error)throw error;
  if(data?.error)throw Error(data.error);
