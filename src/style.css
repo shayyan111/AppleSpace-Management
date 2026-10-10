@@ -1975,3 +1975,63 @@ footer{
     border-radius:14px !important;
   }
 }
+
+
+/* =========================================================
+   Sidebar navigation — unified charcoal buttons
+   ========================================================= */
+
+.sidebar nav{
+  gap:8px !important;
+}
+
+.sidebar nav button{
+  background:linear-gradient(180deg,#343941 0%,#2A2E33 100%) !important;
+  border:1px solid #3E444B !important;
+  color:#ECEEF1 !important;
+  box-shadow:none !important;
+  border-radius:11px !important;
+  min-height:46px;
+  font-weight:700 !important;
+}
+
+.sidebar nav button svg{
+  color:#C9CDD3 !important;
+}
+
+.sidebar nav button:hover{
+  background:linear-gradient(180deg,#40464D 0%,#32373D 100%) !important;
+  border-color:#50565E !important;
+  color:#FFFFFF !important;
+  box-shadow:0 6px 14px rgba(0,0,0,.14) !important;
+  transform:none !important;
+}
+
+.sidebar nav button:hover svg{
+  color:#FFFFFF !important;
+}
+
+.sidebar nav button.active{
+  background:linear-gradient(180deg,#4A5057 0%,#383D43 100%) !important;
+  border-color:#5B6169 !important;
+  color:#FFFFFF !important;
+  box-shadow:
+    inset 3px 0 0 #ADABAE,
+    0 7px 16px rgba(0,0,0,.18) !important;
+}
+
+.sidebar nav button.active svg{
+  color:#FFFFFF !important;
+}
+
+/* Ensure no light/white sidebar button styles leak in */
+.sidebar nav button,
+.sidebar nav button:focus,
+.sidebar nav button:focus-visible{
+  background-color:#2F343A !important;
+}
+
+.sidebar nav button:focus-visible{
+  outline:2px solid #7C828B !important;
+  outline-offset:2px;
+}
