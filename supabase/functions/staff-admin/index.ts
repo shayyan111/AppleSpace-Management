@@ -37,14 +37,16 @@ Deno.serve(async(req:Request)=>{
   };
 
   if(action==="create"){
-    const email=String(body?.email||"").trim().toLowerCase();
+    const suppliedEmail=String(body?.email||"").trim().toLowerCase();
     const password=String(body?.password||"");
     const fullName=String(body?.full_name||"").trim();
     const role=String(body?.role||"salesperson");
     const isActive=body?.is_active!==false;
     const websitePortalAccess=body?.website_portal_access===true;
     const username=normalizeUsername(body?.username);
-    if(!email||!/^\S+@\S+\.\S+$/.test(email))return json({error:"Valid email required"},400);
+    if(suppliedEmail&&!/^\S+@\S+\.\S+$/.test(suppliedEmail))return json({error:"Enter a valid email or leave it blank"},400);
+    if(!suppliedEmail&&!username)return json({error:"Enter a username when email is not provided"},400);
+    const email=suppliedEmail||`${username}@staff.applespace.local`;
     if(password.length<8)return json({error:"Password must be at least 8 characters"},400);
     if(!fullName)return json({error:"Full name required"},400);
     if(!["owner","manager","salesperson"].includes(role))return json({error:"Invalid role"},400);
@@ -58,7 +60,7 @@ Deno.serve(async(req:Request)=>{
     const {error:insertError}=await admin.from("user_profiles").insert({id:userId,full_name:fullName,role,is_active:isActive,username});
     if(insertError){await admin.auth.admin.deleteUser(userId).catch(()=>{});return json({error:insertError.message},400);}
     try{await setWebsiteAccess(userId,websitePortalAccess);}catch(error){await admin.auth.admin.deleteUser(userId).catch(()=>{});return json({error:error instanceof Error?error.message:"Could not assign website portal access"},400);}
-    return json({id:userId,email,username,full_name:fullName,role,is_active:isActive,website_portal_access:websitePortalAccess});
+    return json({id:userId,email:suppliedEmail||null,username,full_name:fullName,role,is_active:isActive,website_portal_access:websitePortalAccess});
   }
 
   if(action==="update"){
