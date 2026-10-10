@@ -86,7 +86,7 @@ export async function syncOffline(){
 export {getOfflineState,initializeOfflineState,retryFailed,setNetworkState,subscribeOfflineState,pendingDetails};
 
 
-export async function createStaffUser(input:{email:string;password:string;full_name:string;role:string;is_active:boolean}){
+export async function createStaffUser(input:{email:string;password:string;username?:string;full_name:string;role:string;is_active:boolean;website_portal_access:boolean}){
  const {data,error}=await db.functions.invoke('staff-admin',{body:{action:'create',...input}});
  if(error)throw error;
  if(data?.error)throw Error(data.error);
@@ -101,9 +101,25 @@ export async function deleteStaffUser(userId:string){
 }
 
 
-export async function updateStaffUser(input:{user_id:string;full_name:string;role:string;is_active:boolean;website_portal_access:boolean}){
+export async function updateStaffUser(input:{user_id:string;username?:string;full_name:string;role:string;is_active:boolean;website_portal_access:boolean}){
  const {data,error}=await db.functions.invoke('staff-admin',{body:{action:'update',...input}});
  if(error)throw error;
  if(data?.error)throw Error(data.error);
  return data;
+}
+
+
+export async function loginWithIdentifier(identifier:string,password:string){
+ const value=identifier.trim();
+ if(!value)throw Error('Enter your username or email.');
+ if(value.includes('@')){
+  const {error}=await db.auth.signInWithPassword({email:value.toLowerCase(),password});
+  if(error)throw Error('Invalid username/email or password');
+  return;
+ }
+ const {data,error}=await db.functions.invoke('login-identifier',{body:{identifier:value,password}});
+ if(error)throw Error('Invalid username/email or password');
+ if(data?.error)throw Error(data.error);
+ const {error:setError}=await db.auth.setSession({access_token:data.access_token,refresh_token:data.refresh_token});
+ if(setError)throw setError;
 }
