@@ -136,3 +136,10 @@ export async function deletePhonePurchase(purchaseId:string){
  if(error)throw error;
  return data;
 }
+
+
+export async function deleteAccessory(accessoryId:string){
+ const {data,error}=await db.rpc('erp_delete_accessory',{p_accessory_id:accessoryId});
+ if(error)throw error;
+ return data;
+}
