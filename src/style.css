@@ -2049,3 +2049,35 @@ footer{
   border-color:#B9756A !important;
   color:#73332B !important;
 }
+
+
+/* Purchase total preview */
+.purchase-total-card{
+  grid-column:1/-1;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  padding:16px 18px;
+  background:linear-gradient(180deg,#2f343a,#262a2f);
+  border:1px solid #3b4047;
+  border-radius:12px;
+  color:#fff;
+}
+.purchase-total-card span{
+  font-weight:700;
+  color:#eef0f2 !important;
+}
+.purchase-total-card strong{
+  margin-left:auto;
+  font-size:22px;
+  color:#fff !important;
+}
+.purchase-total-card small{
+  color:#c7cbd0 !important;
+  white-space:nowrap;
+}
+@media(max-width:600px){
+  .purchase-total-card{align-items:flex-start;flex-direction:column}
+  .purchase-total-card strong{margin-left:0}
+}
