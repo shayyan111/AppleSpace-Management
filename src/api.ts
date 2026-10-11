@@ -143,3 +143,16 @@ export async function deleteAccessory(accessoryId:string){
  if(error)throw error;
  return data;
 }
+
+
+export async function updateAccessoryPurchase(payload:Record<string,unknown>){
+ const {data,error}=await db.rpc('erp_update_accessory_purchase',{p:payload});
+ if(error)throw error;
+ return data;
+}
+
+export async function deleteAccessoryPurchase(purchaseId:string){
+ const {data,error}=await db.rpc('erp_delete_accessory_purchase',{p_purchase_id:purchaseId});
+ if(error)throw error;
+ return data;
+}
