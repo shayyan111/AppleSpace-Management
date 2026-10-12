@@ -70,7 +70,7 @@ export async function enqueueAction(payload:Row,opts:{photo?:File;userId?:string
 }
 
 function n(v:any){const x=Number(v);return Number.isFinite(x)?x:0;}
-function cloneStore(base:Row){const out={...base};for(const k of ['inventory','soldPhones','accessories','customers','sales','saleItems','payments','suppliers','walkInSellers','purchases','supplierPayments','expenses','sessions','ledgerEntries','ledgerPayments'])out[k]=[...(base[k]||[])];return out;}
+function cloneStore(base:Row){const out={...base};for(const k of ['inventory','soldPhones','accessories','customers','sales','saleItems','payments','suppliers','walkInSellers','purchases','supplierPayments','expenses','sessions','ledgerEntries','ledgerPayments'])out[k]=(base[k]||[]).map((row:Row)=>({...row}));return out;}
 export async function projectedStore(base:Row){
  const out=cloneStore(base);const queue=await queueItems();
  for(const q of queue){if(q.status==='failed')continue;const p=q.payload,a=String(p.action||''),m=q.meta,at=q.createdAt;
