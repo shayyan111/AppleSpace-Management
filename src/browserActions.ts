@@ -4,14 +4,36 @@ export function whatsapp(phone:string,text:string){const n=whatsappNumber(phone)
 export function canShareInvoicePDF(file:File){try{return typeof navigator!=='undefined'&&typeof navigator.share==='function'&&navigator.canShare?.({files:[file]})===true}catch{return false}}
 // Keep share/open in the user's click: awaiting a dynamic import here can lose
 // the phone's share permission or cause a popup blocker to reject WhatsApp.
-export async function sendInvoiceWhatsApp(file:File,customer:any,downloadAndOpen=false):Promise<'shared'|'downloaded'|'cancelled'>{
+export async function sendInvoiceWhatsApp(file:File,customer:any,downloadAndOpen=false):Promise<'shared'|'downloaded_shared'|'downloaded'|'cancelled'>{
  const phone=whatsappNumber(String(customer?.mobile||''));
  if(file.type!=='application/pdf'||!file.size)throw Error('Prepare the invoice PDF before sharing.');
  if(!downloadAndOpen&&canShareInvoicePDF(file)){
-  try{await navigator.share({files:[file],title:'AppleSpace invoice '+file.name.replace(/\.pdf$/i,'')});return 'shared'}
-  catch(error){if((error as Error)?.name==='AbortError')return 'cancelled';throw error;}
+  try{
+   await navigator.share({
+    files:[file],
+    title:'AppleSpace invoice '+file.name.replace(/\.pdf$/i,''),
+    text:`AppleSpace invoice ${file.name.replace(/\.pdf$/i,'')} for ${customer?.full_name||'Customer'}`
+   });
+   return 'shared';
+  }catch(error){
+   if((error as Error)?.name==='AbortError')return 'cancelled';
+   throw error;
+  }
  }
  download(file.name,file,'application/pdf');
- whatsapp(phone,`Dear ${customer?.full_name||'Customer'},\nYour AppleSpace invoice ${file.name.replace(/\.pdf$/i,'')} is ready.\nThank you for choosing AppleSpace.`);
+ if(canShareInvoicePDF(file)){
+  try{
+   await navigator.share({
+    files:[file],
+    title:'AppleSpace invoice '+file.name.replace(/\.pdf$/i,''),
+    text:`Send this invoice to ${customer?.full_name||'Customer'} (${phone}).`
+   });
+   return 'downloaded_shared';
+  }catch(error){
+   if((error as Error)?.name==='AbortError')return 'cancelled';
+   throw error;
+  }
+ }
+ whatsapp(phone,`Dear ${customer?.full_name||'Customer'},\nYour AppleSpace invoice ${file.name.replace(/\.pdf$/i,'')} has been downloaded. Please attach the PDF document from Downloads.\nThank you for choosing AppleSpace.`);
  return 'downloaded';
 }
