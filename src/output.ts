@@ -43,7 +43,8 @@ export async function printLabel(item:any,{accessory=false,copies=1,size=default
  const model=esc(item.model||item.name||'');
  const storage=accessory?esc(item.category||''):esc(item.storage||'');
  const pta=accessory?'':esc(item.pta_status?ptaName(item.pta_status):'');
- const label=`<div class="stock-label"><div class="label-brand">AppleSpace</div><div class="label-model">${model}</div><div class="label-storage">${storage}</div><div class="label-pta">${pta}</div><div class="label-barcode-stage"><div class="label-barcode">${svg.outerHTML}</div></div><div class="label-value">${esc(String(code))}</div></div>`;
+ const batteryHealth=!accessory&&item.battery_health!=null&&String(item.battery_health).trim()!==''?esc(String(item.battery_health))+'%':'';
+ const label=`<div class="stock-label"><div class="label-brand">AppleSpace</div><div class="label-model">${model}</div><div class="label-storage">${storage}</div><div class="label-pta">${pta}</div>${batteryHealth?`<div class="label-health">Battery ${batteryHealth}</div>`:''}<div class="label-barcode-stage"><div class="label-barcode">${svg.outerHTML}</div></div><div class="label-value">${esc(String(code))}</div></div>`;
  printLabelHTML(Array(copies).fill(label).join(''),accessory?'Accessory labels':'Phone labels',css);
 }
 export function printInvoice(sale:any,items:any[],payments:any[],customer:any,phones:any[]){printHTML(formsHTML(saleFormPages(sale,items,payments,customer,phones)),sale.invoice_number,formsCSS);}
