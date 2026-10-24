@@ -8,7 +8,7 @@ export function labelCSS(size:LabelSize=defaultLabelSize){
  const format=labelFormats[size];if(!format)throw Error('Choose a supported label size.');
  const {width,height}=format;
  return `@page{size:${width}mm ${height}mm;margin:0}
- html,body{margin:0!important;padding:0!important;width:${width}mm!important;height:${height}mm!important;background:#fff!important}
+ html,body{margin:0!important;padding:0!important;width:${width}mm!important;min-height:${height}mm!important;background:#fff!important}
  body{font-family:Arial,sans-serif;color:#000}
  .stock-label{box-sizing:border-box;width:${width}mm;height:${height}mm;padding:1mm 1.4mm;display:grid;grid-template-rows:auto auto 1fr;row-gap:.55mm;break-after:page;break-inside:avoid;overflow:hidden;background:#fff}
  .stock-label:last-child{break-after:auto}
@@ -17,6 +17,6 @@ export function labelCSS(size:LabelSize=defaultLabelSize){
  .label-barcode{min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:.35mm;overflow:hidden}
  .label-barcode svg{display:block;max-width:100%;width:auto;height:12.4mm}
  .label-value{font-size:6.5pt;font-weight:800;line-height:1;text-align:center;letter-spacing:.12mm;white-space:nowrap}
- @media print{html,body{padding:0!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+ @media print{html,body{margin:0!important;padding:0!important;width:${width}mm!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}.stock-label{page-break-after:always}.stock-label:last-child{page-break-after:auto}}
  `;
 }
