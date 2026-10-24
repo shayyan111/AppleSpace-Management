@@ -4,3 +4,5 @@ export function availableCameras(media?:MediaDevices):Promise<Array<{id:string;l
 export function startPhotoCamera(video:HTMLVideoElement,onReady:(cameras:Array<{id:string;label:string}>)=>void,onError:(message:string)=>void,options?:{deviceId?:string;facingMode?:string}):{stop:()=>void;ready:Promise<void>};
 export function captureSellerPhoto(video:HTMLVideoElement):Promise<File>;
 export function attachSellerPhoto(input:HTMLInputElement,file:File):void;
+
+export function compressSellerPhoto(file:File):Promise<File>;
