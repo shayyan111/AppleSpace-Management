@@ -37,9 +37,9 @@ export async function printLabel(item:any,{accessory=false,copies=1,includeHealt
  if(!Number.isInteger(copies)||copies<1||copies>500)throw Error('Choose 1 to 500 labels.');
  const css=labelCSS(size);
  const code=accessory?item.sku:item.imei_1||item.serial_number||item.barcode_value||item.stock_code;if(!code)throw Error('No label code is available for this item.');
- const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');JsBarcode(svg,String(code),{format:'CODE128',height:46,width:1.35,displayValue:false,margin:0,marginLeft:6,marginRight:6});svg.setAttribute('preserveAspectRatio','xMidYMid meet');
+ const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');JsBarcode(svg,String(code),{format:'CODE128',height:52,width:1.15,displayValue:false,margin:0,marginLeft:4,marginRight:4});svg.setAttribute('preserveAspectRatio','xMidYMid meet');
  const details=accessory?esc(item.category):[item.storage?esc(item.storage):'',item.color?esc(item.color):'',item.pta_status?esc(ptaName(item.pta_status)):'',includeHealth&&item.battery_health!=null&&String(item.battery_health).trim()!==''?'BH '+esc(item.battery_health)+'%':''].filter(Boolean).join(' · ');
- const label=`<div class="stock-label"><div class="label-model">${esc(item.model||item.name)}</div><div class="label-meta">${details}</div><div class="label-barcode">${svg.outerHTML}<div class="label-value">${accessory?'SKU':'IMEI'}: ${esc(code)}</div></div></div>`;
+ const label=`<div class="stock-label"><div class="label-model">${esc(item.model||item.name)}</div><div class="label-meta">${details}</div><div class="label-barcode-stage"><div class="label-barcode">${svg.outerHTML}</div></div><div class="label-value">${accessory?'SKU':'IMEI'}: ${esc(code)}</div></div>`;
  printLabelHTML(Array(copies).fill(label).join(''),accessory?'Accessory labels':'Phone labels',css);
 }
 export function printInvoice(sale:any,items:any[],payments:any[],customer:any,phones:any[]){printHTML(formsHTML(saleFormPages(sale,items,payments,customer,phones)),sale.invoice_number,formsCSS);}
