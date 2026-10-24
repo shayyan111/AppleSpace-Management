@@ -15,8 +15,9 @@ export default function InvoiceWhatsApp({sale,items,payments,customer,phones}:{s
   if(!file||busy)return;setBusy(true);setError('');setStatus('');
   try{
    const result=await sendInvoiceWhatsApp(file,customer,downloadAndOpen);
-   if(result==='shared')setStatus('PDF handed to the sharing app. Complete sending in WhatsApp.');
-   if(result==='downloaded')setStatus(`PDF download started. Attach ${file.name} in the customer's WhatsApp chat using Attach → Document, then press Send.`);
+   if(result==='shared')setStatus('The invoice PDF is attached in the share sheet. Choose WhatsApp, select the customer, and press Send.');
+   if(result==='downloaded_shared')setStatus(`The PDF was downloaded and attached to the share sheet. Choose WhatsApp, select ${customer?.full_name||'the customer'}, and press Send.`);
+   if(result==='downloaded')setStatus(`PDF downloaded as ${file.name}. This browser cannot attach files automatically, so the customer chat was opened for manual attachment.`);
   }catch(e){setError((e as Error).message||'Could not share the PDF. Try Download PDF & open WhatsApp.');}
   finally{setBusy(false)}
  }
@@ -25,7 +26,7 @@ export default function InvoiceWhatsApp({sale,items,payments,customer,phones}:{s
   {!file&&!error&&<p role="status">Preparing invoice PDF…</p>}
   {file&&<>
    <p className="form-hint">{native?`Choose WhatsApp, select ${customer?.full_name||'the customer'} (${customer?.mobile}), and press Send. The invoice PDF is included.`:"Download the PDF and open the customer's WhatsApp chat. Attach the downloaded file using Attach → Document, then press Send."}</p>
-   <div className="invoice-share-actions"><button type="button" className="primary" disabled={busy} onClick={()=>send()}><Send size={16}/>{busy?'Opening…':native?'Send PDF via WhatsApp':'Download PDF & open WhatsApp'}</button>{native&&<button type="button" disabled={busy} onClick={()=>send(true)}>Download PDF & open WhatsApp</button>}<button type="button" disabled={busy} onClick={()=>download(file.name,file,'application/pdf')}><Download size={16}/>Download PDF</button></div>
+   <div className="invoice-share-actions"><button type="button" className="primary" disabled={busy} onClick={()=>send()}><Send size={16}/>{busy?'Opening…':native?'Send PDF via WhatsApp':'Download PDF & open WhatsApp'}</button>{native&&<button type="button" disabled={busy} onClick={()=>send(true)}>Download PDF & share via WhatsApp</button>}<button type="button" disabled={busy} onClick={()=>download(file.name,file,'application/pdf')}><Download size={16}/>Download PDF</button></div>
    {status&&<><p role="status" className="form-hint">{status}</p><button type="button" disabled={busy} onClick={()=>whatsapp(String(customer?.mobile||''),`AppleSpace invoice ${sale.invoice_number}`)}>Open customer chat</button></>}
   </>}
   {error&&<div role="alert" className="error">{error}</div>}
