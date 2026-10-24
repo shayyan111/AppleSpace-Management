@@ -156,3 +156,10 @@ export async function deleteAccessoryPurchase(purchaseId:string){
  if(error)throw error;
  return data;
 }
+
+
+export async function updateManualLedgerEntry(payload:Record<string,unknown>){
+ const {data,error}=await db.rpc('erp_update_manual_ledger_entry',{p:payload});
+ if(error)throw error;
+ return data;
+}
