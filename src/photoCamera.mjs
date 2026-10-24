@@ -45,3 +45,49 @@ export function attachSellerPhoto(input,file,dependencies={}){
  if(!Transfer)throw Error('This browser cannot attach a camera photo. Choose a photo file instead.');
  const transfer=new Transfer();transfer.items.add(file);input.files=transfer.files;
 }
+
+export async function compressSellerPhoto(file,dependencies={}){
+ if(!file)return file;
+ if(!['image/jpeg','image/png','image/webp'].includes(file.type))throw Error('Choose a JPEG, PNG or WebP photo.');
+ const createBitmap=dependencies.createImageBitmap??globalThis.createImageBitmap;
+ let source,width,height,cleanup=()=>{};
+ if(createBitmap){
+  source=await createBitmap(file);
+  width=source.width;height=source.height;
+  cleanup=()=>source.close?.();
+ }else{
+  const URLImpl=dependencies.URL??globalThis.URL;
+  const ImageImpl=dependencies.Image??globalThis.Image;
+  if(!URLImpl?.createObjectURL||!ImageImpl)throw Error('This browser cannot compress this photo.');
+  const url=URLImpl.createObjectURL(file);
+  source=await new Promise((resolve,reject)=>{const img=new ImageImpl();img.onload=()=>resolve(img);img.onerror=()=>reject(Error('Could not read this photo.'));img.src=url;});
+  width=source.naturalWidth||source.width;height=source.naturalHeight||source.height;
+  cleanup=()=>URLImpl.revokeObjectURL(url);
+ }
+ try{
+  const maxSide=900;
+  const scale=Math.min(1,maxSide/Math.max(width,height));
+  const canvas=(dependencies.createCanvas||(()=>document.createElement('canvas')))();
+  canvas.width=Math.max(1,Math.round(width*scale));canvas.height=Math.max(1,Math.round(height*scale));
+  const ctx=canvas.getContext('2d');if(!ctx)throw Error('Could not compress this photo.');
+  ctx.drawImage(source,0,0,canvas.width,canvas.height);
+  let quality=.68,blob=null;
+  for(let i=0;i<5;i++){
+   blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/jpeg',quality));
+   if(!blob)throw Error('Could not compress this photo.');
+   if(blob.size<=180*1024||quality<=.38)break;
+   quality-=.08;
+  }
+  if(blob.size>280*1024){
+   const shrink=Math.sqrt((220*1024)/blob.size);
+   const next=(dependencies.createCanvas||(()=>document.createElement('canvas')))();
+   next.width=Math.max(1,Math.round(canvas.width*shrink));next.height=Math.max(1,Math.round(canvas.height*shrink));
+   const nextCtx=next.getContext('2d');if(!nextCtx)throw Error('Could not compress this photo.');
+   nextCtx.drawImage(canvas,0,0,next.width,next.height);
+   blob=await new Promise(resolve=>next.toBlob(resolve,'image/jpeg',.58));
+   if(!blob)throw Error('Could not compress this photo.');
+  }
+  const base=(file.name||'seller-photo').replace(/\.[^.]+$/,'');
+  return new File([blob],base+'-compressed.jpg',{type:'image/jpeg',lastModified:Date.now()});
+ }finally{cleanup();}
+}
