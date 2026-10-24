@@ -33,13 +33,17 @@ function printLabelHTML(html:string,title:string,css:string){
  });
 }
 function printHTML(html:string,title:string,extraCSS=''){const defer=setTimeout;const frame=document.createElement('iframe');frame.style.cssText='position:fixed;width:0;height:0;border:0';document.body.append(frame);const doc=frame.contentDocument!;doc.open();doc.write(`<!doctype html><html><head><title>${esc(title)}</title><style>body{font:14px Arial;color:#192824;margin:35px}${localStorage.getItem('invoice-template')==='receipt'?'body{width:72mm;margin:0}body h1{font-size:24px}body td,body th{padding:6px;font-size:10px}body small{font-size:9px}body .total{font-size:13px}':''}h1{font-size:30px;margin:0}h2{font-size:22px}small{color:#66736e}table{width:100%;border-collapse:collapse;margin:24px 0}td,th{text-align:left;padding:12px;border-bottom:1px solid #ddd}.total{text-align:right;font-size:18px}img{max-width:100%}.label{width:62mm;text-align:center;border:1px dashed #aaa;padding:3mm;page-break-inside:avoid}.label svg{width:56mm}.label img{width:20mm}@page{margin:12mm}${extraCSS}</style></head><body>${html}</body></html>`);doc.close();const fontReady=extraCSS.includes('AppleSpaceForm')&&doc.fonts?Promise.all([doc.fonts.load('12px AppleSpaceForm'),doc.fonts.load('bold 12px AppleSpaceForm')]).catch(()=>[]):Promise.resolve();Promise.all([fontReady,doc.fonts?.ready||Promise.resolve(),...[...doc.images].map(i=>i.complete?Promise.resolve():new Promise<void>(resolve=>{i.onload=()=>resolve();i.onerror=()=>resolve()}))]).then(()=>{frame.contentWindow!.focus();frame.contentWindow!.print();defer(()=>frame.remove(),60000)});}
-export async function printLabel(item:any,{accessory=false,copies=1,includeHealth=true,size=defaultLabelSize}:{accessory?:boolean;copies?:number;includeHealth?:boolean;size?:LabelSize}={}){
+export async function printLabel(item:any,{accessory=false,copies=1,size=defaultLabelSize}:{accessory?:boolean;copies?:number;size?:LabelSize}={}){
  if(!Number.isInteger(copies)||copies<1||copies>500)throw Error('Choose 1 to 500 labels.');
  const css=labelCSS(size);
  const code=accessory?item.sku:item.imei_1||item.serial_number||item.barcode_value||item.stock_code;if(!code)throw Error('No label code is available for this item.');
- const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');JsBarcode(svg,String(code),{format:'CODE128',height:44,width:1.05,displayValue:false,margin:0,marginLeft:3,marginRight:3});svg.setAttribute('preserveAspectRatio','xMidYMid meet');
- const details=accessory?esc(item.category):[item.storage?esc(item.storage):'',item.color?esc(item.color):'',item.pta_status?esc(ptaName(item.pta_status)):'',includeHealth&&item.battery_health!=null&&String(item.battery_health).trim()!==''?'BH '+esc(item.battery_health)+'%':''].filter(Boolean).join(' · ');
- const label=`<div class="stock-label"><div class="label-model">${esc(item.model||item.name)}</div><div class="label-meta">${details}</div><div class="label-barcode-stage"><div class="label-barcode">${svg.outerHTML}</div></div><div class="label-value">${accessory?'SKU':'IMEI'}: ${esc(code)}</div></div>`;
+ const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+ JsBarcode(svg,String(code),{format:'CODE128',height:34,width:1.25,displayValue:false,margin:0,marginLeft:0,marginRight:0});
+ svg.setAttribute('preserveAspectRatio','xMidYMid meet');
+ const model=esc(item.model||item.name||'');
+ const storage=accessory?esc(item.category||''):esc(item.storage||'');
+ const pta=accessory?'':esc(item.pta_status?ptaName(item.pta_status):'');
+ const label=`<div class="stock-label"><div class="label-brand">AppleSpace</div><div class="label-model">${model}</div><div class="label-storage">${storage}</div><div class="label-pta">${pta}</div><div class="label-barcode-stage"><div class="label-barcode">${svg.outerHTML}</div></div><div class="label-value">${esc(String(code))}</div></div>`;
  printLabelHTML(Array(copies).fill(label).join(''),accessory?'Accessory labels':'Phone labels',css);
 }
 export function printInvoice(sale:any,items:any[],payments:any[],customer:any,phones:any[]){printHTML(formsHTML(saleFormPages(sale,items,payments,customer,phones)),sale.invoice_number,formsCSS);}
