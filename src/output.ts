@@ -15,7 +15,7 @@ function printLabelHTML(html:string,title:string,css:string){
  const defer=setTimeout;
  const frame=document.createElement('iframe');
  frame.setAttribute('aria-hidden','true');
- frame.style.cssText='position:fixed;left:-10000px;top:0;width:25.4mm;height:50.8mm;border:0;background:#fff';
+ frame.style.cssText='position:fixed;left:-10000px;top:0;width:50.8mm;height:25.4mm;border:0;background:#fff';
  document.body.append(frame);
  const doc=frame.contentDocument!;
  doc.open();
