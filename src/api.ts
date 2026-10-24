@@ -163,3 +163,10 @@ export async function updateManualLedgerEntry(payload:Record<string,unknown>){
  if(error)throw error;
  return data;
 }
+
+
+export async function deleteSupplier(supplierId:string){
+ const {data,error}=await db.rpc('erp_delete_supplier',{p_supplier_id:supplierId});
+ if(error)throw error;
+ return data;
+}
