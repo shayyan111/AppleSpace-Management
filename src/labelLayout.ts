@@ -1,5 +1,5 @@
 export const labelFormats={
- '2x1':{width:50.8,height:25.4,name:'2 × 1 inch (50.8 × 25.4 mm)'},
+ '2x1':{width:25.4,height:50.8,name:'2 × 1 inch roll (25.4 × 50.8 mm)'},
 } as const;
 export type LabelSize=keyof typeof labelFormats;
 export const defaultLabelSize:LabelSize='2x1';
@@ -19,13 +19,13 @@ export function labelCSS(size:LabelSize=defaultLabelSize){
  body{font-family:Arial,sans-serif;color:#000}
  .stock-label{
   box-sizing:border-box;
-  width:${width}mm;
-  height:${height}mm;
-  margin:0;
-  padding:1.2mm 1.5mm;
+  width:${width}mm!important;
+  height:${height}mm!important;
+  margin:0!important;
+  padding:1.2mm 1mm;
   display:grid;
   grid-template-rows:auto auto 1fr auto;
-  row-gap:.45mm;
+  row-gap:.7mm;
   overflow:hidden;
   background:#fff;
   break-after:page;
@@ -33,66 +33,31 @@ export function labelCSS(size:LabelSize=defaultLabelSize){
  }
  .stock-label:last-child{break-after:auto;page-break-after:auto}
  .label-model{
-  font-size:8pt;
-  font-weight:800;
-  line-height:1;
-  text-align:center;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
+  font-size:8.4pt;font-weight:800;line-height:1.05;text-align:center;
+  white-space:normal;overflow:hidden
  }
  .label-meta{
-  font-size:6.4pt;
-  font-weight:700;
-  line-height:1;
-  text-align:center;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
+  font-size:6.2pt;font-weight:700;line-height:1.1;text-align:center;
+  white-space:normal;overflow:hidden
  }
  .label-barcode-stage{
-  min-height:0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  overflow:hidden;
+  min-height:0;display:flex;align-items:center;justify-content:center;overflow:hidden
  }
  .label-barcode{
-  width:100%;
-  height:100%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  overflow:hidden;
+  width:21mm;height:31mm;display:flex;align-items:center;justify-content:center;
+  transform:rotate(90deg);transform-origin:center center
  }
  .label-barcode svg{
-  display:block;
-  width:auto;
-  max-width:100%;
-  height:12mm;
+  display:block;width:30mm;height:18mm;max-width:none
  }
  .label-value{
-  font-size:6.2pt;
-  font-weight:800;
-  line-height:1;
-  text-align:center;
-  letter-spacing:.08mm;
-  white-space:nowrap;
+  font-size:6pt;font-weight:800;line-height:1.05;text-align:center;
+  white-space:nowrap;overflow:hidden
  }
  @media print{
-  html,body{
-   margin:0!important;
-   padding:0!important;
-   width:${width}mm!important;
-   height:${height}mm!important;
-   overflow:hidden!important;
-   -webkit-print-color-adjust:exact;
-   print-color-adjust:exact;
+  html,body,.stock-label{
+   margin:0!important;padding-top:0!important;width:${width}mm!important;height:${height}mm!important;
   }
-  .stock-label{
-   margin:0!important;
-   width:${width}mm!important;
-   height:${height}mm!important;
-  }
+  html,body{overflow:hidden!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
  }`;
 }
